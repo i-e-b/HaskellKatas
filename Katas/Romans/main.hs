@@ -1,20 +1,20 @@
 
 main = do
 	putStrLn "Give me a natural number"
-	num <- getLine
-	putStrLn (romanise . read $ num)
-	
-romanise :: Int -> String
-romanise x =
-	rom x ""
+	numinp <- getLine
+	let n = read numinp :: Int1
+	putStrLn (romanise n)
 
-rom :: Int -> String -> String
-rom 0 str = str
-rom i str 
-	| i >= 1000 = rom (i - 1000) (str:"M")
-	| i >= 500 = rom (i - 500) (str:"D")
-	| i >= 100 = rom (i - 100) (str:"C")
-	| i >= 50 = rom (i - 50) (str:"L")
-	| i >= 10 = rom (i - 10) (str:"X")
-	| i >= 5 = rom (i - 5) (str:"V")
-	| otherwise = rom (i - 1) (str:"I")
+romanise :: Int -> String
+romanise = rom "id est "
+
+rom :: String -> Int -> String
+rom s 0 = s
+rom s i 
+	| i >= 1000 = rom (s ++ "M") (i - 1000)
+	| i >= 500 = rom (s ++ "D") (i - 500)
+	| i >= 100 = rom (s ++ "C") (i - 100)
+	| i >= 50 = rom (s ++ "L") (i - 50)
+	| i >= 10 = rom (s ++ "X") (i - 10)
+	| i >= 5 = rom (s ++ "V") (i - 5)
+	| otherwise = rom (s ++ "I") (i - 1)
