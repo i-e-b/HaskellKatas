@@ -1,0 +1,1 @@
+ghc -O2 --make threaded.hs -threaded -rtsopts
