@@ -1,12 +1,11 @@
-
 main = do
 	putStrLn "Give me a natural number"
 	numinp <- getLine
 	let n = read numinp :: Int
-	putStrLn (romanise n)
+	putStrLn . romanise $ n
 
 romanise :: Int -> String
-romanise = optimise . numerals "id est "
+romanise = reverse . optimise . numerals ""
 
 numerals :: String -> Int -> String
 numerals s 0 = s
@@ -19,5 +18,13 @@ numerals s i
 	| i >= 5 = numerals (s ++ "V") (i - 5)
 	| otherwise = numerals (s ++ "I") (i - 1)
 
+opt :: [Char] -> [Char] -> String
+opt [] xss = xss
+opt ('I':'I':'I':'I':xs) xss = opt xs ("vi" ++ xss)
+opt ('I':'I':'I':xs) xss = opt xs ("vii" ++ xss)
+opt ('X':'X':'X':'X':xs) xss = opt xs ("lx" ++ xss)
+opt (x:xs) xss = opt xs (x : xss)
+
 optimise :: String -> String
-optimise a = a
+optimise x = opt x ""
+
