@@ -1,3 +1,5 @@
+import qualified Data.List as T
+
 main = do
 	putStrLn "Give me a natural number"
 	numinp <- getLine
@@ -5,7 +7,7 @@ main = do
 	putStrLn . romanise $ n
 
 romanise :: Int -> String
-romanise = reverse . optimise . numerals ""
+romanise = optimise . numerals ""
 
 numerals :: String -> Int -> String
 numerals s 0 = s
@@ -18,13 +20,20 @@ numerals s i
 	| i >= 5 = numerals (s ++ "V") (i - 5)
 	| otherwise = numerals (s ++ "I") (i - 1)
 
-opt :: [Char] -> [Char] -> String
-opt [] xss = xss
-opt ('I':'I':'I':'I':xs) xss = opt xs ("vi" ++ xss)
-opt ('I':'I':'I':xs) xss = opt xs ("vii" ++ xss)
-opt ('X':'X':'X':'X':xs) xss = opt xs ("lx" ++ xss)
-opt (x:xs) xss = opt xs (x : xss)
-
 optimise :: String -> String
-optimise x = opt x ""
+optimise inp = join . optimiseGroups . T.group $ inp
+
+optimiseGroups :: [String] -> [String]
+optimiseGroups x = map subopt x 
+
+join :: [String] -> String
+join grps = foldl (++)  "" grps
+
+subopt :: String -> String
+subopt "IIII" = "IV"
+subopt "III" = "IIV"
+subopt "XXXX" = "XL"
+subopt "CCCC" = "CD"
+subopt "CCC" = "CCD"
+subopt x = x
 
