@@ -7,18 +7,13 @@ main = do
 	putStrLn . romanise $ n
 
 romanise :: Int -> String
-romanise = optimise . numerals ""
+romanise = optimise . numerals [(1000, 'M'), (500, 'D'),(100, 'C'),(50, 'L'),(10, 'X'),(5, 'V'),(1, 'I')] ""
 
-numerals :: String -> Int -> String
-numerals s 0 = s
-numerals s i 
-	| i >= 1000 = numerals (s ++ "M") (i - 1000)
-	| i >= 500 = numerals (s ++ "D") (i - 500)
-	| i >= 100 = numerals (s ++ "C") (i - 100)
-	| i >= 50 = numerals (s ++ "L") (i - 50)
-	| i >= 10 = numerals (s ++ "X") (i - 10)
-	| i >= 5 = numerals (s ++ "V") (i - 5)
-	| otherwise = numerals (s ++ "I") (i - 1)
+numerals :: [(Int,Char)] -> String -> Int -> String
+numerals ((scale, chr):xs) s i
+	| i >= scale = numerals ((scale,chr):xs) (s ++ [chr]) (i - scale)
+	| otherwise  = numerals xs s i
+numerals [] s i = s
 
 optimise :: String -> String
 optimise inp = join . optimiseGroups . T.group $ inp
