@@ -26,21 +26,20 @@ data Statistics = Statistics { left::Int, right::Int, collisions::Int } deriving
 type Analysis = [[KeyPosition]]
 type Keyboard = [KeyPosition]
 {-
- OLV  IYX
-THE_  .DNA
-QPWU  MGJR
- ZKF  SCB
+ OLI   VYX
+THER   _DNA
+WQP.   UGJS
+ ZKM   FCB
            
-abcdefghijklmnopqrstuvwxyz._
 abcdefghijklmnopqrstuvwxyz._
  
 -}
 theKeyboard =
-	[             ('O', 1, L), ('L', 2, L), ('V', 3, L),     ('I', 4, R), ('Y', 5, R), ('X', 6, R)
-	,('T', 0, L), ('H', 1, L), ('E', 2, L), (' ', 3, L),     ('.', 4, R), ('D', 5, R), ('N', 6, R), ('A', 7, R)
-	,('Q', 0, L), ('P', 1, L), ('W', 2, L), ('U', 3, L),     ('M', 4, R), ('G', 5, R), ('J', 6, R), ('R', 7, R)
-	,             ('Z', 1, L), ('K', 2, L), ('F', 3, L),     ('S', 4, R), ('C', 5, R), ('B', 6, R)
-	,(',', 4, R) ] -- period and comma on same key
+	[             ('O', 1, L), ('L', 2, L), ('I', 3, L),     ('V', 4, R), ('Y', 5, R), ('X', 6, R)
+	,('T', 0, L), ('H', 1, L), ('E', 2, L), ('R', 3, L),     (' ', 4, R), ('D', 5, R), ('N', 6, R), ('A', 7, R)
+	,('W', 0, L), ('Q', 1, L), ('P', 2, L), ('.', 3, L),     ('U', 4, R), ('G', 5, R), ('J', 6, R), ('S', 7, R)
+	,             ('Z', 1, L), ('K', 2, L), ('M', 3, L),     ('F', 4, R), ('C', 5, R), ('B', 6, R)
+	,(',', 3, L) ] -- period and comma on same key
 
 {- Targets:
    * Minimise same finger
