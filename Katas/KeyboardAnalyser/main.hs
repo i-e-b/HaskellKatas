@@ -1,10 +1,17 @@
 import Data.List
 import Data.Char
 import Data.Maybe
+{- 
+	Keyboard analyser in Haskell.
+	Purpose is to take a description of keyboard layout
+	and a test script, then output an analysed version of the test script
 
--- Keyboard analyser in Haskell.
--- Purpose is to take a description of keyboard layout
--- and a test script, then output an analysed version of the test script
+	Output is coded:
+	  left keys are lowercase
+	  right keys are upper case
+	  collision groups (to be avoided) start with '[' and end with ']'
+	  double letters (like "ll", "oo") are stripped.
+-}
 
 main = do
 	str <- getContents
@@ -32,11 +39,17 @@ theKeyboard =
    * Prefer 'finger rolls' for common bi- and tri- graphs
 -}
 
-printAnalysis :: Analysis -> String
-printAnalysis anz = 
-	let inner x = map (\(a,_,_)->a) x
-	in  concat (map inner anz)
 
+printAnalysis :: Analysis -> String
+printAnalysis anz = concat (map inner anz)
+	where
+		dEnd x = if (length x) > 1 then "]" else ""
+		dStart x = if (length x) > 1 then "[" else ""
+		inner x = (dStart x) ++ (map caseLR x) ++ dEnd x
+
+caseLR :: KeyPosition -> Char
+caseLR (chr, col, side) = if (side == L) then (toLower chr) else (toUpper chr)
+		
 -- Analyse a string against a keyboard.
 analyse :: Keyboard -> String -> Analysis
 analyse k s = groupedKeys . (mapKeys k) $ singles s
