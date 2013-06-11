@@ -1,13 +1,25 @@
 
- OLV  IYX
-THE_  .DNA
-QWPU  MGJS
- ZKF  RCB
-Left keys: 1585; Right keys: 1268; Collisions: 187
+ MK.   JFB
+ZLDI   ONSA
+RTHE   _UGC
+ WPQ   XYV 
+Left keys: 1354; Right keys: 1499; Collisions: 103
 
- OLI   VYX
-THER   _DNA
-WQP.   UGJS
- ZKM   FCB
-Left keys: 1452; Right keys: 1401; Collisions: 176
+ MK.   JFB
+ZLDI   CNSA
+RTHE   _UGO
+ WPQ   XYV 
+Left keys: 1354; Right keys: 1499; Collisions: 63
 
+ BJF   .KM
+ASCN   IDLZ
+OG_U   EHTR
+ VXY   QPW
+Left keys: 1499; Right keys: 1354; Collisions: 63
+
+
+ MK.   JFB
+ZLDO   INSA
+RTHE   _UGC
+ WPQ   XYV 
+Left keys: 1350; Right keys: 1503; Collisions: 104
