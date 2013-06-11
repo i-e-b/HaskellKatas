@@ -18,17 +18,17 @@ main = do
 	putStrLn . analyseString $ str
 	
 {-
- BJF   .KM
-ASCN   IDLZ
+ BJF   YKM
+ASZN   IDLC
 OG_U   EHTR
- VXY   QPW 
+ VX.   QPW 
 -}
 theKeyboard =
-	[             ('B', 1, L), ('J', 2, L), ('F', 3, L),     ('.', 4, R), ('K', 5, R), ('M', 6, R)
-	,('A', 0, L), ('S', 1, L), ('C', 2, L), ('N', 3, L),     ('I', 4, R), ('D', 5, R), ('L', 6, R), ('Z', 7, R)
+	[             ('B', 1, L), ('J', 2, L), ('F', 3, L),     ('Y', 4, R), ('K', 5, R), ('M', 6, R)
+	,('A', 0, L), ('S', 1, L), ('Z', 2, L), ('N', 3, L),     ('I', 4, R), ('D', 5, R), ('L', 6, R), ('C', 7, R)
 	,('O', 0, L), ('G', 1, L), (' ', 2, L), ('U', 3, L),     ('E', 4, R), ('H', 5, R), ('T', 6, R), ('R', 7, R)
-	,             ('V', 1, L), ('X', 2, L), ('Y', 3, L),     ('Q', 4, R), ('P', 5, R), ('W', 6, R)
-	,(',', 4, R) ] -- period and comma on same key
+	,             ('V', 1, L), ('X', 2, L), ('.', 3, L),     ('Q', 4, R), ('P', 5, R), ('W', 6, R)
+	,(',', 3, L) ] -- period and comma on same key
 
 {- 
 For technical writing:

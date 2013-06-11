@@ -18,8 +18,8 @@ OG_U   EHTR
 Left keys: 1499; Right keys: 1354; Collisions: 63
 
 
- MK.   JFB
-ZLDO   INSA
-RTHE   _UGC
- WPQ   XYV 
-Left keys: 1350; Right keys: 1503; Collisions: 104
+ BJF   YKM
+ASZN   IDLC
+OG_U   EHTR
+ VX.   QPW 
+Left keys: 1440; Right keys: 1413; Collisions: 38
