@@ -1,0 +1,13 @@
+
+ QCK   DL.
+ARST   HNEI
+BFPG   _JOY
+ XUM   WVZ
+Left keys: 1146; Right keys: 1675; Collisions: 197
+
+ OLV  IYX
+THE_  .DNA
+QPWU  MGJR
+ ZKF  CSB
+Left keys: 1585; Right keys: 1268; Collisions: 192
+
