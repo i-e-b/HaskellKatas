@@ -29,7 +29,7 @@ type Keyboard = [KeyPosition]
  OLV  IYX
 THE_  .DNA
 QPWU  MGJR
- ZKF  CSB
+ ZKF  SCB
            
 abcdefghijklmnopqrstuvwxyz._
 abcdefghijklmnopqrstuvwxyz._
@@ -39,7 +39,7 @@ theKeyboard =
 	[             ('O', 1, L), ('L', 2, L), ('V', 3, L),     ('I', 4, R), ('Y', 5, R), ('X', 6, R)
 	,('T', 0, L), ('H', 1, L), ('E', 2, L), (' ', 3, L),     ('.', 4, R), ('D', 5, R), ('N', 6, R), ('A', 7, R)
 	,('Q', 0, L), ('P', 1, L), ('W', 2, L), ('U', 3, L),     ('M', 4, R), ('G', 5, R), ('J', 6, R), ('R', 7, R)
-	,             ('Z', 1, L), ('K', 2, L), ('F', 3, L),     ('C', 4, R), ('S', 5, R), ('B', 6, R)
+	,             ('Z', 1, L), ('K', 2, L), ('F', 3, L),     ('S', 4, R), ('C', 5, R), ('B', 6, R)
 	,(',', 4, R) ] -- period and comma on same key
 
 {- Targets:

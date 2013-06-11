@@ -16,13 +16,10 @@ numerals ((scale, chr):xs) s i
 numerals [] s i = s
 
 optimise :: String -> String
-optimise inp = join . optimiseGroups . T.group $ inp
+optimise inp = T.concat . optimiseGroups . T.group $ inp
 
 optimiseGroups :: [String] -> [String]
 optimiseGroups x = map subopt x 
-
-join :: [String] -> String
-join grps = foldl (++)  "" grps
 
 subopt :: String -> String
 subopt "IIII" = "IV"
