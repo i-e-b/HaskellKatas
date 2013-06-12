@@ -1,25 +1,17 @@
+Lowest Collisions:
 
- MK.   JFB
-ZLDI   ONSA
-RTHE   _UGC
- WPQ   XYV 
-Left keys: 1354; Right keys: 1499; Collisions: 103
-
- MK.   JFB
-ZLDI   CNSA
-RTHE   _UGO
- WPQ   XYV 
-Left keys: 1354; Right keys: 1499; Collisions: 63
-
- BJF   .KM
-ASCN   IDLZ
-OG_U   EHTR
- VXY   QPW
-Left keys: 1499; Right keys: 1354; Collisions: 63
+ JPY   B.M
+AZNI   SLDC
+O_HE   GUTR
+ XKQ   VFW 
+Left keys: 1674; Right keys: 1179; Collisions: 33
 
 
- BJF   YKM
-ASZN   IDLC
-OG_U   EHTR
- VX.   QPW 
-Left keys: 1440; Right keys: 1413; Collisions: 38
+Lots of finger rolls: (try this first; if the collisions are a pain, use the low collision variant)
+
+ JPY   BM.
+ANDI   SCLZ
+OTHE   G_UR
+ XKQ   VWF
+
+ Left keys: 1470; Right keys: 1383; Collisions: 160
