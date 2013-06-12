@@ -19,12 +19,19 @@ tests = TestList [ "initital position 1"	~: ([1])				~=? (take 1 $ bellsAtPositi
 --
 
 
--- bells, with a wildcard at 15.
+-- bells, with a wildcard at 15. FIXME: this should be at every 15th position.
 -- TODO: generalise this.
 bellsAtPosition :: Int -> [Integer]
 bellsAtPosition x = bells !! x
+
+-- crappy one-swap job
 bells = (take 16 $ bellSimple [1..8]) ++ (bellSimple (swap'' $ (bellSimple [1..8]) !! 15))
-bellSimple = concat . unfoldr (\ ls -> Just ([ls, swap ls], swap'(swap ls))) -- bell swapping with no wildcard
+
+-- IDEA: take the string of changes (as in the Kata) and pass a repeating list into the unfold using a tuple.
+
+-- This is the basic pattern of bell swapping.
+bellSimple :: [a] -> [[a]]
+bellSimple = concat . unfoldr (\ ls -> Just ([ls, swap ls], swap'(swap ls)))
 swap (a:b:c:d:e:f:g:h:xs) = b:a:d:c:f:e:h:g:xs
 swap' (a:b:c:d:e:f:g:h:xs) = a:c:b:e:d:g:f:h:xs
 swap'' (a:b:c:d:e:f:g:h:xs) = a:b:d:c:f:e:h:g:xs
