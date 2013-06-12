@@ -7,6 +7,7 @@
 import Test.HUnit
 import Data.List
 
+-- Unit tests
 tests = TestList [ "initital position 1"	~: ([1])				~=? (take 1 $ bellsAtPosition 0)
                  , "initital position 2"	~: ([2])				~=? (take 1 $ bellsAtPosition 1)
 				 , "initial round"			~: ([1,2,3,4,5,6,7,8])	~=? (bellsAtPosition 0)
@@ -16,25 +17,43 @@ tests = TestList [ "initital position 1"	~: ([1])				~=? (take 1 $ bellsAtPositi
 				 , "round 16"				~: ([1,3,5,2,7,4,8,6])	~=? (bellsAtPosition 16)
 				 , "round 112"				~: ([1,2,3,4,5,6,7,8])	~=? (bellsAtPosition 112)
                  ]
---
-
-
--- bells, with a wildcard at 15. FIXME: this should be at every 15th position.
--- TODO: generalise this.
-bellsAtPosition :: Int -> [Integer]
-bellsAtPosition x = bells !! x
-
--- crappy one-swap job
-bells = (take 16 $ bellSimple [1..8]) ++ (bellSimple (swap'' $ (bellSimple [1..8]) !! 15))
-
--- IDEA: take the string of changes (as in the Kata) and pass a repeating list into the unfold using a tuple.
-
--- This is the basic pattern of bell swapping.
-bellSimple :: [a] -> [[a]]
-bellSimple = concat . unfoldr (\ ls -> Just ([ls, swap ls], swap'(swap ls)))
-swap (a:b:c:d:e:f:g:h:xs) = b:a:d:c:f:e:h:g:xs
-swap' (a:b:c:d:e:f:g:h:xs) = a:c:b:e:d:g:f:h:xs
-swap'' (a:b:c:d:e:f:g:h:xs) = a:b:d:c:f:e:h:g:xs
 
 main = do
 	runTestTT tests
+
+-- Settings
+
+start = [1..8]										-- The initial list of bell pullers
+pattern = (7 `_of` [[], [1,8]]  ) ++ [[], [1,2]]	-- 'hold' patterns. 1-based indexes of pullers to stay put
+
+-- Implementation
+
+pullPattern :: [[Int]]
+pullPattern = cycle pattern
+
+bells :: [[Int]]
+bells = [start] ++ (bellLoop pullPattern start)
+
+-- permuteByPattern takes a pull pattern and a current arrangement, returns next arrangement.
+permuteByPattern :: [Int] -> [Int] -> [Int]
+permuteByPattern pat inp = (map unscrew) $ swapPairs (decide pat inp)
+	where
+		decide pat inp = [ if (fst x `elem` pat) then Left (snd x) else Right (snd x) | x <- zip [1..] inp ] -- left if held, right if movable
+		unscrew x = either (\a -> a) (\a -> a) x -- lifts out of Either
+
+-- Swap pairs of movable pullers. This won't swap two movable pullers either side of a held puller
+swapPairs :: [Either a b] -> [Either a b]
+swapPairs ((Right x):(Right y):xs) = (Right y):(Right x):(swapPairs xs)
+swapPairs (x:xs) = x:(swapPairs xs)
+swapPairs [] = []
+
+-- Spew an endless list of the permutations
+bellLoop :: [[Int]] -> [Int] -> [[Int]]
+bellLoop (pat:xs) current = 
+	let next = permuteByPattern pat current
+	in  [next] ++ (bellLoop xs next)
+
+-- Little helpers
+bellsAtPosition x = bells !! x
+_of x ls = concat $ replicate x ls
+
