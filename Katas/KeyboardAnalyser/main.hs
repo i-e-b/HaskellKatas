@@ -49,15 +49,16 @@ data Side = L | R deriving (Show, Eq)
 type Column = Integer
 type KeyPosition = (Char, Column, Side)
 
-data Statistics = Statistics { left::Int, right::Int, collisions::Int } deriving (Show)
+data Statistics = Statistics { left::Int, right::Int, collisions::Int, columns::[Int] } deriving (Show)
 
 type Analysis = [[KeyPosition]]
 type Keyboard = [KeyPosition]
 
-analyseString x = concat
-	[printAnalysis . (analyse theKeyboard) $ x 
-	, "\r\n"
-	, printStatistics . statistics . (analyse theKeyboard) $ x]
+analyseString x =
+	let result = analyse theKeyboard x
+	in concat [printAnalysis result
+	   , "\r\n"
+	   , printStatistics (statistics result)]
 
 printAnalysis :: Analysis -> String
 printAnalysis anz = concat (map inner anz)
@@ -69,9 +70,9 @@ printAnalysis anz = concat (map inner anz)
 printStatistics :: Statistics -> String
 printStatistics x = "Left keys: " ++ (lefts x) ++ "; Right keys: " ++ (rights x) ++ "; Collisions: " ++ (collides x)
 	where
-		lefts (Statistics ls rs cl) = show ls
-		rights (Statistics ls rs cl) = show rs
-		collides (Statistics ls rs cl) = show cl
+		lefts (Statistics ls rs cl cln) = show ls
+		rights (Statistics ls rs cl cln) = show rs
+		collides (Statistics ls rs cl cln) = show cl
 		
 -- Analyse a string against a keyboard.
 analyse :: Keyboard -> String -> Analysis
@@ -79,9 +80,10 @@ analyse k s = groupedKeys . (mapKeys k) $ singles s
 
 -- Get usage statistics
 statistics :: Analysis -> Statistics
-statistics = (foldl (addstat) (Statistics 0 0 0)) . statlist
+statistics ans = sumcol . (foldl (addstat) (Statistics 0 0 0 [])) . statlist $ ans
 	where
-		addstat (Statistics lA rA cA) (Statistics lB rB cB) = Statistics (lA + lB) (rA + rB) (cA + cB)
+		addstat (Statistics lA rA cA clnA) (Statistics lB rB cB clnB) = Statistics (lA + lB) (rA + rB) (cA + cB) (clnA ++ clnB)
+		sumcol (Statistics a b c cols) = Statistics a b c (addRange cols [0,0..])
 
 statlist :: [[KeyPosition]] -> [Statistics]
 statlist x = (concat [map (leftOrRight) y | y <- x]) ++ (map collides x)
@@ -92,6 +94,17 @@ statlist x = (concat [map (leftOrRight) y | y <- x]) ++ (map collides x)
 isLeftSide :: KeyPosition -> Int
 isLeftSide (_, _, side) = if (side == L) then 1 else 0
 isRightSide x = 1 - (isLeftSide x)
+
+-- Input list of columns, output is colums each with count of hit,
+-- so [1,2,1,4,6,6,7] becomes [0, 2, 1, 0, 1, 0, 2, 1]
+addRange :: [Int] -> [Int] -> [Int]
+addRange (inp:xs) sums = addRange xs (incrl inp sums)
+addRange [] sums = sums
+
+-- increment the nth item of a list
+incrl :: Num a => Int -> [a] -> [a]
+incrl a xs = (take (a) xs) ++ [((xs !! a) + 1)] ++ (drop (a+1) xs)
+
 		
 -- string with double-letters removed
 singles :: String -> String
