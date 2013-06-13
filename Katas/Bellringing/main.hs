@@ -8,6 +8,7 @@ import Test.HUnit
 import Data.List
 
 -- Unit tests
+{-
 tests = TestList [ "initital position 1"	~: ([1])				~=? (take 1 $ bellsAtPosition 0)
                  , "initital position 2"	~: ([2])				~=? (take 1 $ bellsAtPosition 1)
 				 , "initial round"			~: ([1,2,3,4,5,6,7,8])	~=? (bellsAtPosition 0)
@@ -17,13 +18,17 @@ tests = TestList [ "initital position 1"	~: ([1])				~=? (take 1 $ bellsAtPositi
 				 , "round 16"				~: ([1,3,5,2,7,4,8,6])	~=? (bellsAtPosition 16)
 				 , "round 112"				~: ([1,2,3,4,5,6,7,8])	~=? (bellsAtPosition 112)
                  ]
-
+-}
+tests = TestList [ "initial round"			~: (["Sam", "Jane", "Tom", "Bob", "Steve", "James", "Harriet", "Sophie"])	~=? (bellsAtPosition 0)
+				 , "round 16"				~: (["Sam","Tom","Steve","Jane","Harriet","Bob","Sophie","James"])	~=? (bellsAtPosition 16)
+                 ]
 main = do
 	runTestTT tests
 
 -- Settings
 
-start = [1..8]										-- The initial list of bell pullers
+--start = [1..8]										-- The initial list of bell pullers
+start = ["Sam", "Jane", "Tom", "Bob", "Steve", "James", "Harriet", "Sophie"]
 pattern = (7 `_of` [[], [1,8]]  ) ++ [[], [1,2]]	-- 'hold' patterns. 1-based indexes of pullers to stay put
 
 -- Implementation
@@ -31,15 +36,14 @@ pattern = (7 `_of` [[], [1,8]]  ) ++ [[], [1,2]]	-- 'hold' patterns. 1-based ind
 pullPattern :: [[Int]]
 pullPattern = cycle pattern
 
-bells :: [[Int]]
 bells = [start] ++ (bellLoop pullPattern start)
 
 -- permuteByPattern takes a pull pattern and a current arrangement, returns next arrangement.
-permuteByPattern :: [Int] -> [Int] -> [Int]
+permuteByPattern :: [Int] -> [a] -> [a]
 permuteByPattern pat inp = (map unscrew) $ swapPairs (decide pat inp)
 	where
 		decide pat inp = [ if (fst x `elem` pat) then Left (snd x) else Right (snd x) | x <- zip [1..] inp ] -- left if held, right if movable
-		unscrew = either (\a -> a) (\a -> a) -- lifts out of Either
+		unscrew = either id id -- lifts out of Either
 
 -- Swap pairs of movable pullers. This won't swap two movable pullers either side of a held puller
 swapPairs :: [Either a b] -> [Either a b]
@@ -48,12 +52,12 @@ swapPairs (x:xs) = x:(swapPairs xs)
 swapPairs [] = []
 
 -- Spew an endless list of the permutations
-bellLoop :: [[Int]] -> [Int] -> [[Int]]
+bellLoop :: [[Int]] -> [a] -> [[a]]
 bellLoop (pat:xs) current = 
 	let next = permuteByPattern pat current
 	in  [next] ++ (bellLoop xs next)
 
 -- Little helpers
 bellsAtPosition x = bells !! x
-_of x = concat $ replicate x
+_of x = concat . replicate x
 
