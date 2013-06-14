@@ -1,23 +1,18 @@
 Lowest Collisions:
+==================
 
- JPY   B.M
-AZNI   SLDC
-O_HE   GUTR
- XKQ   VFW 
-Left keys: 1674; Right keys: 1179; Collisions: 33
+ PJY   MB.
+ANZI   DSLC
+OH_E   TGUR
+ KXQ   WVF 
+Left keys: 1674; Right keys: 1147; Collisions: 32; Freq: [340,326,489,519,391,267,251,238]
 
 
-Lots of finger rolls: (try this first; if the collisions are a pain, use the low collision variant)
+Lots of finger rolls: (try this first; if the collisions are a pain, use the low collision variant?)
 =====================
-
- JPY   BM.
-ANDI   SCLZ
-OTHE   G_UR
- XKQ   VWF
-Left keys: 1470; Right keys: 1383; Collisions: 160
  
- MK.   CFB
-ZLIO   DNAS
-RTHE   _UGJ
- WPQ   VYX
-Left keys: 1452; Right keys: 1401; Collisions: 166; Freq: [166,407,351,528,657,331,250,163]
+ MK.   CFX
+ZTHE   _UJS
+RLIO   DNAG
+ WPQ   VYB
+Left keys: 1420; Right keys: 1401; Collisions: 152; Freq: [166,407,351,496,657,331,210,203]

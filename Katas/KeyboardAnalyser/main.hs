@@ -18,12 +18,19 @@ main = do
 	putStrLn . analyseString $ str
 	
 {-
- JPY   B.M
-AZNI   SLDC
-O_HE   GUTR
- XKQ   VFW  
+"PJYMB.ANZIDSLCOH ETGURKXQWVF" --> low collision
+ PJY   MB.
+ANZI   DSLC
+OH_E   TGUR
+ KXQ   WVF 
+;
+"MK.CFXZTHE UJSRLIODNAGWPQVYB" --> good rolls
+ MK.   CFX
+ZTHE   _UJS
+RLIO   DNAG
+ WPQ   VYB
 -}
-theKeyboard = buildKeyboard "JPYB.MAZNISLDCO HEGUTRXKQVFW" blankLayout
+theKeyboard = buildKeyboard "MK.CFXZTHE UJSRLIODNAGWPQVYB" blankLayout
 	where
 		buildKeyboard (letter:ls) (key:ks) = (setKey letter key) : buildKeyboard ls ks
 		buildKeyboard _ _ = []
