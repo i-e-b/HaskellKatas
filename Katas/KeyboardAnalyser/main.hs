@@ -17,30 +17,6 @@ main = do
 	str <- getContents
 	putStrLn . analyseString $ str
 	
-{-
-"PJYMB.ANZIDSLCOH ETGURKXQWVF" --> low collision
- PJY   MB.
-ANZI   DSLC
-OH_E   TGUR
- KXQ   WVF 
-;
-"MK.CFXZTHE UJSRLIODNAGWPQVYB" --> good rolls
- MK.   CFX
-ZTHE   _UJS
-RLIO   DNAG
- WPQ   VYB
--}
-theKeyboard = buildKeyboard "MK.CFXZTHE UJSRLIODNAGWPQVYB" blankLayout
-	where
-		buildKeyboard (letter:ls) (key:ks) = (setKey letter key) : buildKeyboard ls ks
-		buildKeyboard _ _ = []
-		setKey newletter (oldletter, column, side) = (newletter, column, side)
-		blankLayout =
-			[             ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R)
-			,('?', 0, L), ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R), ('?', 7, R)
-			,('?', 0, L), ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R), ('?', 7, R)
-			,             ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R)]
-	
 {- 
 For technical writing:
 1's:  ET,AIS,LNOR,DPU,BCFGHMV,JKQWXZY
@@ -54,7 +30,32 @@ Targets:
    * Minimise same finger
    * Ignore alternation
    * Prefer 'finger rolls' for common bi- and tri- graphs
+
+"PJYMB.ANZIDSLCOH ETGURKXQWVF" --> low collision
+ PJY   MB.
+ANZI   DSLC
+OH_E   TGUR
+ KXQ   WVF 
+;
+"MK.CFXZTHE UJSRLIODNAGWPQVYB" --> good rolls
+ MP.   FCX
+ZTHE   _UJS
+RLIO   DNAG
+ WKQ   VYB
 -}
+allKeyChars = "MP.FCXZTHE SJURLIODNAGWKQVYB"
+theKeyboard = buildKeyboard allKeyChars blankLayout
+	where
+		buildKeyboard (letter:ls) (key:ks) = (setKey letter key) : buildKeyboard ls ks
+		buildKeyboard _ _ = []
+		setKey newletter (oldletter, column, side) = (newletter, column, side)
+		blankLayout =
+			[             ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R)
+			,('?', 0, L), ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R), ('?', 7, R)
+			,('?', 0, L), ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R), ('?', 7, R)
+			,             ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R)]
+	
+
 
 data Side = L | R deriving (Show, Eq)
 type Column = Int
@@ -94,10 +95,9 @@ analyse k s = groupedKeys . (mapKeys k) $ singles s
 
 -- Get usage statistics
 statistics :: Analysis -> Statistics
-statistics ans = sumcol . (foldl (addstat) (Statistics 0 0 0 [])) . statlist $ ans
+statistics ans = (foldl (addstat) (Statistics 0 0 0 [0,0..])) . statlist $ ans
 	where
-		addstat (Statistics lA rA cA clnA) (Statistics lB rB cB clnB) = Statistics (lA + lB) (rA + rB) (cA + cB) (clnA ++ clnB)
-		sumcol (Statistics a b c cols) = Statistics a b c (sumPositions cols)
+		addstat (Statistics lA rA cA clnA) (Statistics lB rB cB clnB) = Statistics (lA + lB) (rA + rB) (cA + cB) (sumPositions clnA clnB)
 
 statlist :: [[KeyPosition]] -> [Statistics]
 statlist x = (concat [map (leftOrRight) y | y <- x]) ++ (map collides x)
@@ -116,8 +116,8 @@ columnNumber (_, col, _) = col
 -- Input list of columns, output is columns each with count of hit,
 -- so [1,2,1,4,6,6,7] becomes [0, 2, 1, 0, 1, 0, 2, 1, 0, 0, ...]
 -- result is infinite list
-sumPositions :: [Int] -> [Int]
-sumPositions = addUp [0,0..]
+sumPositions :: [Int] -> [Int] -> [Int]
+sumPositions accum = addUp accum
 	where
 		addUp sums (x:xs) = addUp (incrl x sums) xs
 		addUp sums [] = sums
@@ -127,7 +127,9 @@ sumPositions = addUp [0,0..]
 
 -- string with double-letters removed
 singles :: String -> String
-singles str = map (\x -> x !! 0) (group str)
+singles str = map (\x -> x !! 0) (group $ filter (\a -> elem a filterKeys) str)
+	where
+		filterKeys = allKeyChars ++ (map toLower allKeyChars)
 
 -- Group keys by column (any groups length > 1 are undesirable)
 collision (kA, cA, sA) (kB, cB, sB) = cA == cB
