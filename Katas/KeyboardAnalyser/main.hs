@@ -18,18 +18,22 @@ main = do
 	putStrLn . analyseString $ str
 	
 {-
- JPY   BM.
-ANDI   SCLZ
-OTHE   G_UR
- XKQ   VWF 
+ JPY   B.M
+AZNI   SLDC
+O_HE   GUTR
+ XKQ   VFW  
 -}
-theKeyboard =
-	[             ('J', 1, L), ('P', 2, L), ('Y', 3, L),     ('B', 4, R), ('M', 5, R), ('.', 6, R)
-	,('A', 0, L), ('N', 1, L), ('D', 2, L), ('I', 3, L),     ('S', 4, R), ('C', 5, R), ('L', 6, R), ('Z', 7, R)
-	,('O', 0, L), ('T', 1, L), ('H', 2, L), ('E', 3, L),     ('G', 4, R), (' ', 5, R), ('U', 6, R), ('R', 7, R)
-	,             ('X', 1, L), ('K', 2, L), ('Q', 3, L),     ('V', 4, R), ('W', 5, R), ('F', 6, R)
-	,(',', 6, R) ] -- period and comma on same key
-
+theKeyboard = buildKeyboard "JPYB.MAZNISLDCO HEGUTRXKQVFW" blankLayout
+	where
+		buildKeyboard (letter:ls) (key:ks) = (setKey letter key) : buildKeyboard ls ks
+		buildKeyboard _ _ = []
+		setKey newletter (oldletter, column, side) = (newletter, column, side)
+		blankLayout =
+			[             ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R)
+			,('?', 0, L), ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R), ('?', 7, R)
+			,('?', 0, L), ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R), ('?', 7, R)
+			,             ('?', 1, L), ('?', 2, L), ('?', 3, L),     ('?', 4, R), ('?', 5, R), ('?', 6, R)]
+	
 {- 
 For technical writing:
 1's:  ET,AIS,LNOR,DPU,BCFGHMV,JKQWXZY

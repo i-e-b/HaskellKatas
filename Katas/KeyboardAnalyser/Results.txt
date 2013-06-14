@@ -14,10 +14,10 @@ Lots of finger rolls: (try this first; if the collisions are a pain, use the low
 ANDI   SCLZ
 OTHE   G_UR
  XKQ   VWF
-
- Left keys: 1470; Right keys: 1383; Collisions: 160
+Left keys: 1470; Right keys: 1383; Collisions: 160
  
  MK.   CFB
 ZLIO   DNAS
 RTHE   _UGJ
  WPQ   VYX
+Left keys: 1452; Right keys: 1401; Collisions: 166; Freq: [166,407,351,528,657,331,250,163]
