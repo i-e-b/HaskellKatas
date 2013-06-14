@@ -1,1 +1,1 @@
-ghc -o main main.hs -v
+ghc -o main main.hs

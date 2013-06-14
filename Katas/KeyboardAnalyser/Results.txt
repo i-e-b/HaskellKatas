@@ -8,6 +8,7 @@ Left keys: 1674; Right keys: 1179; Collisions: 33
 
 
 Lots of finger rolls: (try this first; if the collisions are a pain, use the low collision variant)
+=====================
 
  JPY   BM.
 ANDI   SCLZ
@@ -15,3 +16,8 @@ OTHE   G_UR
  XKQ   VWF
 
  Left keys: 1470; Right keys: 1383; Collisions: 160
+ 
+ MK.   CFB
+ZLIO   DNAS
+RTHE   _UGJ
+ WPQ   VYX
