@@ -18,6 +18,11 @@ main = do
 	putStrLn . analyseString $ str
 	
 {- 
+Targets:
+   * Minimise same finger
+   * Ignore alternation
+   * Prefer 'finger rolls' for common bi- and tri- graphs
+   
 For technical writing:
 1's:  ET,AIS,LNOR,DPU,BCFGHMV,JKQWXZY
 2's:  TH ER ON AN RE HE IN ED ND
@@ -26,24 +31,19 @@ For technical writing:
 Start of word: T O A W B C D S F M R
 End of word:   E S T D N R Y F L O G H A K
 
-Targets:
-   * Minimise same finger
-   * Ignore alternation
-   * Prefer 'finger rolls' for common bi- and tri- graphs
-
 "PJYMB.ANZIDSLCOH ETGURKXQWVF" --> low collision
  PJY   MB.
 ANZI   DSLC
 OH_E   TGUR
  KXQ   WVF 
 ;
-"MK.CFXZTHE UJSRLIODNAGWPQVYB" --> good rolls
- MP.   FCX
-ZTHE   _UJS
+"MP.FXCZTHEU JSRLIODNAGWKQVYB" --> good rolls
+ MP.   FXC
+ZTHE   U_JS
 RLIO   DNAG
  WKQ   VYB
 -}
-allKeyChars = "MP.FCXZTHE SJURLIODNAGWKQVYB"
+allKeyChars = "MP.FXCZTHEU JSRLIODNAGWKQVYB"
 theKeyboard = buildKeyboard allKeyChars blankLayout
 	where
 		buildKeyboard (letter:ls) (key:ks) = (setKey letter key) : buildKeyboard ls ks

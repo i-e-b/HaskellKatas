@@ -5,14 +5,24 @@ Lowest Collisions:
 ANZI   DSLC
 OH_E   TGUR
  KXQ   WVF 
-Left keys: 1674; Right keys: 1147; Collisions: 32; Freq: [340,326,489,519,391,267,251,238]
+ 
+Left keys: 61121; Right keys: 39878; Collisions: 2066; Freq: [13705,11956,18398,17062,14793,8644,8750,7691]
 
 
 Lots of finger rolls: (try this first; if the collisions are a pain, use the low collision variant?)
 =====================
  
- MK.   CFX
+ MP.   FCX
 ZTHE   _UJS
 RLIO   DNAG
- WPQ   VYB
-Left keys: 1420; Right keys: 1401; Collisions: 152; Freq: [166,407,351,496,657,331,210,203]
+ WKQ   VYB
+ 
+Left keys: 48451; Right keys: 52548; Collisions: 6827; Freq: [4764,15140,12019,16528,23580,13131,9193,6644]
+
+
+ MP.   FXC
+ZTHE   U_JS
+RLIO   DNAG
+ WKQ   VYB
+
+Left keys: 48451; Right keys: 52548; Collisions: 5794; Freq: [4764,15140,12019,16528,8302,25840,11762,6644]
