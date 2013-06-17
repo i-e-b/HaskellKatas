@@ -1,0 +1,1 @@
+-- Very basic version of the checkout kata
