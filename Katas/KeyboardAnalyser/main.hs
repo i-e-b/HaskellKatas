@@ -37,13 +37,13 @@ ANZI   DSLC
 OH_E   TGUR
  KXQ   WVF 
 ;
-"MP.FXCZTHEU JSRLIODNAGWKQVYB" --> good rolls
- MP.   FXC
-ZTHE   U_JS
+"MP.CXFZTHE UJSRLIODNAGWKQVYB" --> good rolls
+ MP.   CXF
+ZTHE   _UJS
 RLIO   DNAG
  WKQ   VYB
 -}
-allKeyChars = "MP.FXCZTHEU JSRLIODNAGWKQVYB"
+allKeyChars = "MP.CXFZTHE UJSRLIODNAGWKQVYB"
 theKeyboard = buildKeyboard allKeyChars blankLayout
 	where
 		buildKeyboard (letter:ls) (key:ks) = (setKey letter key) : buildKeyboard ls ks

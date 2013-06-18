@@ -20,9 +20,9 @@ RLIO   DNAG
 Left keys: 48451; Right keys: 52548; Collisions: 6827; Freq: [4764,15140,12019,16528,23580,13131,9193,6644]
 
 
- MP.   FXC
-ZTHE   U_JS
+ MP.   CXF
+ZTHE   _UJS
 RLIO   DNAG
  WKQ   VYB
 
-Left keys: 48451; Right keys: 52548; Collisions: 5794; Freq: [4764,15140,12019,16528,8302,25840,11762,6644]
+Left keys: 48451; Right keys: 52548; Collisions: 5278; Freq: [4764,15140,12019,16528,24305,10562,11037,6644]
