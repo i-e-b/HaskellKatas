@@ -10,3 +10,4 @@ Ideas / things to try
  - Some bit twiddling
  - Lifting transform for image
  - Displaying images / GL
+ - HTTP / RMQ client
