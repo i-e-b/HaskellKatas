@@ -82,12 +82,9 @@ printAnalysis anz = concat (map inner anz)
 
 -- Show finger use statistics
 printStatistics :: Statistics -> String
-printStatistics x = "Left keys: " ++ (lefts x) ++ "; Right keys: " ++ (rights x) ++ "; Collisions: " ++ (collides x) ++ "; Freq: " ++ (frequencies x)
+printStatistics x = "Left keys: " ++ (show $ left x) ++ "; Right keys: " ++ (show $ right x) ++ "; Collisions: " ++ (show $ collisions x) ++ "; Freq: " ++ (frequencies x)
 	where
-		lefts       (Statistics ls _ _ _) = show ls
-		rights      (Statistics _ rs _ _) = show rs
-		collides    (Statistics _ _ cl _) = show cl
-		frequencies (Statistics _ _ _ cln) = show $ take 8 cln
+		frequencies x = show $ take 8 (columns x)
 		
 -- Analyse a string against a keyboard.
 analyse :: Keyboard -> String -> Analysis
@@ -99,19 +96,17 @@ statistics ans = (foldl (addstat) (Statistics 0 0 0 [0,0..])) . statlist $ ans
 	where
 		addstat (Statistics lA rA cA clnA) (Statistics lB rB cB clnB) = Statistics (lA + lB) (rA + rB) (cA + cB) (sumPositions clnA clnB)
 
+-- All the chosen keypositions, map left and right stats, column numbers and add collisions to end.
 statlist :: [[KeyPosition]] -> [Statistics]
 statlist x = (concat [map (leftOrRight) y | y <- x]) ++ (map collides x)
 	where
 		leftOrRight keypos = Statistics (isLeftSide keypos) (isRightSide keypos) 0 [(columnNumber keypos)]
 		collides grp = Statistics 0 0 ((length grp) - 1) []
-		
+		columnNumber (_, col, _) = col
 
 isLeftSide :: KeyPosition -> Int
 isLeftSide (_, _, side) = if (side == L) then 1 else 0
 isRightSide x = 1 - (isLeftSide x)
-
-columnNumber :: KeyPosition -> Int
-columnNumber (_, col, _) = col
 
 -- Input list of columns, output is columns each with count of hit,
 -- so [1,2,1,4,6,6,7] becomes [0, 2, 1, 0, 1, 0, 2, 1, 0, 0, ...]
@@ -123,8 +118,6 @@ sumPositions accum = addUp accum
 		addUp sums [] = sums
 		incrl a xs = (take (a) xs) ++ [((xs !! a) + 1)] ++ (drop (a+1) xs)
 
---let sumPositions = addUp [0,0..] where {addUp sums (x:xs) = addUp (incrl x sums) xs; addUp sums [] = sums;} 
-
 -- string with double-letters removed
 singles :: String -> String
 singles str = map (\x -> x !! 0) (group $ filter (\a -> elem a filterKeys) str)
@@ -132,9 +125,10 @@ singles str = map (\x -> x !! 0) (group $ filter (\a -> elem a filterKeys) str)
 		filterKeys = allKeyChars ++ (map toLower allKeyChars)
 
 -- Group keys by column (any groups length > 1 are undesirable)
-collision (kA, cA, sA) (kB, cB, sB) = cA == cB
 groupedKeys :: [KeyPosition] -> [[KeyPosition]]
-groupedKeys = groupBy collision
+groupedKeys = 
+	let collision (kA, cA, sA) (kB, cB, sB) = cA == cB
+	in  groupBy collision
 
 -- True if the KeyPosition is that of the char provided
 matchChar :: Char -> KeyPosition -> Bool
