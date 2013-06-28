@@ -11,4 +11,4 @@ Ideas / things to try
  - Lifting transform for image
  - Displaying images / GL
  - HTTP / RMQ client
- - http://www.mathcs.emory.edu/~cheung/Courses/584-StreamDB/Syllabus/07-Heavy/Manku.html
+ - Lossy counting: http://www.mathcs.emory.edu/~cheung/Courses/584-StreamDB/Syllabus/07-Heavy/Manku.html

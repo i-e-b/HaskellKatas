@@ -39,7 +39,7 @@ permuteByPattern :: [Int] -> [a] -> [a]
 permuteByPattern pat inp = (map unscrew) $ swapPairs (decide pat inp)
 	where
 		decide pat inp = [ if (fst x `elem` pat) then Left (snd x) else Right (snd x) | x <- zip [1..] inp ] -- left if held, right if movable
-		unscrew = either id id -- lifts out of Either
+		unscrew = either id id -- drops out of Either
 
 -- Swap pairs of movable pullers. This won't swap two movable pullers either side of a held puller
 swapPairs :: [Either a b] -> [Either a b]
