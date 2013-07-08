@@ -6,6 +6,8 @@ A few simple little things in Haskell
 Ideas / things to try
 ----------------------
  - Read image, write image
+ - Multiple paths XML (like DDEX processing)
+ - Anagrams kata (try hashing, tries, bloom?)
  - Fountain codes
  - Some bit twiddling
  - Lifting transform for image
