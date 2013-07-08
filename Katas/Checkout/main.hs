@@ -12,6 +12,7 @@ Accept items in any order, apply matching offers
 
 import Data.List
 import Test.HUnit
+import ListExtra
 
 -- Unit tests
 
@@ -48,15 +49,8 @@ priceList = [("AAA", 130), ("BB", 45), ("A", 50), ("B", 30), ("C", 20), ("D", 15
 prices :: Maybe String -> [(String, Int)] -> [Int]
 prices Nothing _ = undefined
 prices _ [] = []
-prices (Just []) _ = []
 prices (Just str) pl = 
 	case (prefixLookup str pl) of
 		Nothing -> []
 		Just (prefix,val) -> val : (prices (stripPrefix prefix str) pl)
 
--- Given a list and tuples of (prefix, value) return first matched tuple or nothing.
--- Treated here as String -> [(String, Int)] -> Maybe (String, Int)
-prefixLookup :: (Eq a) => [a] -> [([a], b)] -> Maybe ([a],b)
-prefixLookup [] _ = Nothing
-prefixLookup _ [] = Nothing
-prefixLookup list (found@(prefix, value):rest) = if (prefix `isPrefixOf` list) then (Just found) else prefixLookup list rest
