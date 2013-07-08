@@ -23,6 +23,9 @@ tests = TestList [ "empty"		~: (0)				~=? (priceOf "")
                  , "AAA"		~: (130)			~=? (priceOf "AAA")
                  , "AAABB"		~: (175)			~=? (priceOf "AAABB")
                  , "ACAABCB"	~: (215)			~=? (priceOf "ACAABCB")
+				 , "AAA A"		~: (180)			~=? (priceOf "AAAA")
+				 , "BB B"		~: (75)				~=? (priceOf "BBB")
+				 , "AAA AAA A"	~: (310)			~=? (priceOf "AAAAAAA")
                  ]
 --
 -- On execute, run tests.
@@ -31,16 +34,23 @@ main = do
 	
 -- Implementation
 
+-- priceOf: determines the total cost of a basket of codes.
+-- sorts and groups the codes, applies deals (which fall through to
+--   item-by-item pricing)
 priceOf :: String -> Int
 priceOf str = sum $ map (deals) (group $ sort str)
 
+-- deals: takes a string of items, checks for deals
+-- falls through to itemised pricing if none found
 deals :: String -> Int
-deals "AAA" = 130
-deals "BB" = 45
+deals ('A':'A':'A':more) = 130 + deals more -- is there a nicer way to pattern match this?
+deals ('B':'B':more) = 45 + deals more
 deals other = sum $ map price other
-	where
-		price 'A' = 50
-		price 'B' = 30
-		price 'C' = 20
-		price 'D' = 15
-		price _ = undefined
+
+-- itemised pricing
+price :: Char -> Int
+price 'A' = 50
+price 'B' = 30
+price 'C' = 20
+price 'D' = 15
+price _ = undefined
