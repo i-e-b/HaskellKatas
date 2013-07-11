@@ -9,7 +9,7 @@ import Text.XML.HaXml.Posn
 
 exampleFile = "example.xml"
 
-main = readFile exampleFile >>= putStrLn . testFunc .(xmlParse ("error in " ++ exampleFile))
+main = readFile exampleFile >>= putStrLn . testFunc . xmlParse ("error in " ++ exampleFile)
 
 testFunc = howManyDeals -- should be 12
 
@@ -22,10 +22,15 @@ rootElementName (Document _ _ elem _ ) = elemName elem
 --
 
 howManyDeals :: Document Posn -> String
-howManyDeals doc = show . length $ allTags "Deal" (rootElemContent doc)
-	where
-		allTags = deep . tag
+howManyDeals doc = show . length $ allTags "Deal" (docContent doc)
 
-rootElemContent :: Document Posn -> Content Posn
-rootElemContent (Document _ _ elem _ ) = CElem elem noPos
+{- - General - -}
+-- All matching tags in the document
+allTags :: String -> CFilter i
+allTags = deep . tag
 
+-- Root element of a document, as Content
+docContent :: Document Posn -> Content Posn
+docContent (Document _ _ elem _ ) = CElem elem noPos
+
+{- - DDEX Specific - -}
