@@ -5,17 +5,32 @@
 import Text.XML.HaXml
 import Text.XML.HaXml.Types
 import Text.XML.HaXml.Parse
-import qualified Text.XML.HaXml.Pretty as Print
-import Text.XML.HaXml.Posn
+import Text.XML.HaXml.Posn (Posn, noPos)
 import Text.XML.HaXml.Combinators
 
-type Root = Content Posn
+import Control.Applicative
+
+type Node = Content Posn
+type Nodes = [Content Posn]
 
 exampleFile = "example.xml"
 
-main = readFile exampleFile >>= putStrLn . testFunc . xmlParse ("error in " ++ exampleFile)
+main = readFile exampleFile >>= putStrLn . testFunc . docContent. xmlParse ("error in " ++ exampleFile)
 
-testFunc = senderId . docContent
+{-- count deal tags
+testFunc doc = show $ foldr (+) 0 (allMatches doc)
+	where
+		allMatches doc = fmap (length . allDeals) doc
+		-}
+
+-- find first preference sender id
+testFunc doc = show $ foldr (++) "" (allMatches doc)
+	where
+		allMatches doc = fmap (verbatim . senderId) doc
+		
+
+--doc <$> docContent <*> senderId <*> verbatim
+--verbatim $ fmap senderId (docContent doc)
 
 
 {- - General - -}
@@ -30,34 +45,26 @@ rootElementName (Document _ _ elem _ ) = elemName elem
 		elemName (Elem (N n) _ _) = n
 		elemName (Elem (QN ns n) _ _) = n
 
--- Root element of a document, as Content
-docContent :: Document Posn -> Root
-docContent (Document _ _ elem _ ) = CElem elem noPos
+-- Node element of a document, as Content
+docContent :: Document Posn -> Nodes
+docContent (Document _ _ elem _ ) = tag "ernm:NewReleaseMessage" $ CElem elem noPos
 
 {- - DDEX Specific - -}
-howManyDeals :: Root -> String
-howManyDeals doc = show . length $ allTags "Deal" doc
+allDeals :: Node -> Nodes
+allDeals = allTags "Deal"
 
-senderId :: Root -> String
-senderId doc = verbatim (tag "ernm:NewReleaseMessage" /> tag "MessageHeader" /> tag "MessageSender" /> tag "PartyId" $ doc)
+senderId :: Node -> Nodes
+senderId = ((allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
+	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId"))
 
 
 {- - Utilities - -}
-{- | Convert [Content] to a printable String, with a default if the 
-passed-in [Content] is [], signifying a lack of a match. -}
+-- Convert [Content] to a printable String, with a default if not found
 contentToStringDefault :: String -> [Content Posn] -> String
 contentToStringDefault msg [] = msg
 contentToStringDefault _ x = contentToString x
 
-{- | Convert [Content] to a printable string, taking care to unescape it.
-
-An implementation without unescaping would simply be:
-
-> contentToString = concatMap (show . content)
-
-Because HaXml's unescaping only works on Elements, we must make sure that
-whatever Content we have is wrapped in an Element, then use txt to
-pull the insides back out. -}
+-- Convert [Content] to a printable string, taking care to unescape it.
 contentToString :: [Content Posn] -> String
 contentToString = 
     concatMap procContent

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ernm:NewReleaseMessage 
-MessageSchemaVersionId="ern/34" LanguageAndScriptCode="en" xs:schemaLocation="http://ddex.net/xml/ern/34 http://ddex.net/xml/ern/34/release-notification.xsd" xmlns:ernm="http://ddex.net/xml/ern/34" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
+<ernm:NewReleaseMessage MessageSchemaVersionId="ern/34" LanguageAndScriptCode="en" xs:schemaLocation="http://ddex.net/xml/ern/34 http://ddex.net/xml/ern/34/release-notification.xsd" xmlns:ernm="http://ddex.net/xml/ern/34" xmlns:xs="http://www.w3.org/2001/XMLSchema-instance">
 <MessageHeader>
    <MessageThreadId>249d22f1-c517-481a-8b89-0e69dc1fc33c</MessageThreadId>
    <MessageId>D303F9BD366C1BAFE04400212806964E</MessageId>
