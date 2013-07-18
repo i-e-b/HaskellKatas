@@ -10,12 +10,21 @@ import Text.XML.HaXml.Combinators
 
 import Control.Applicative
 
+-- (Node -> Nodes) == (CFilter Posn)
 type Node = Content Posn
 type Nodes = [Content Posn]
 
 exampleFile = "example.xml"
 
-main = readFile exampleFile >>= putStrLn . testFunc . docContent. xmlParse ("error in " ++ exampleFile)
+main = readFile exampleFile >>= putStrLn . testFunc . parseXml
+
+-- Parse a DDEX XML string into nodes
+parseXml :: String -> Nodes
+parseXml fileName = docContent $ xmlParse ("error in " ++ fileName) fileName
+
+-- Concatenate all text (without elements) from the given nodes
+innerText :: Nodes -> String
+innerText nodes = concat $ map verbatim (map (keep /> txt) nodes)
 
 {-- count deal tags
 testFunc doc = show $ foldr (+) 0 (allMatches doc)
@@ -24,14 +33,8 @@ testFunc doc = show $ foldr (+) 0 (allMatches doc)
 		-}
 
 -- find first preference sender id
-testFunc doc = show $ foldr (++) "" (allMatches doc)
-	where
-		allMatches doc = fmap (verbatim . senderId) doc
-		
-
---doc <$> docContent <*> senderId <*> verbatim
---verbatim $ fmap senderId (docContent doc)
-
+testFunc :: Nodes -> String
+testFunc doc = concat (innerText . senderId <$> doc)
 
 {- - General - -}
 -- All matching tags in the document
@@ -45,7 +48,7 @@ rootElementName (Document _ _ elem _ ) = elemName elem
 		elemName (Elem (N n) _ _) = n
 		elemName (Elem (QN ns n) _ _) = n
 
--- Node element of a document, as Content
+-- Select New release message from an XML document
 docContent :: Document Posn -> Nodes
 docContent (Document _ _ elem _ ) = tag "ernm:NewReleaseMessage" $ CElem elem noPos
 
@@ -58,21 +61,3 @@ senderId = ((allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
 	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId"))
 
 
-{- - Utilities - -}
--- Convert [Content] to a printable String, with a default if not found
-contentToStringDefault :: String -> [Content Posn] -> String
-contentToStringDefault msg [] = msg
-contentToStringDefault _ x = contentToString x
-
--- Convert [Content] to a printable string, taking care to unescape it.
-contentToString :: [Content Posn] -> String
-contentToString = 
-    concatMap procContent
-    where procContent x = 
-              verbatim $ keep /> txt $ CElem (unesc (fakeElem x)) noPos
-
-          fakeElem :: Content Posn -> Element Posn
-          fakeElem x = Elem (N "fake") [] [x]
-
-          unesc :: Element Posn -> Element Posn
-          unesc = xmlUnEscape stdXmlEscaper
