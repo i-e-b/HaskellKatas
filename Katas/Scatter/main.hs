@@ -32,7 +32,7 @@ scatter n = take (fromIntegral n) [ x - 1 | x <- scatterSequence (magic n) 1, (t
 -- magic number, current position, all output; produces an infinite repeating list
 scatterSequence :: Maybe Word32 -> Word32 -> [Word32]
 scatterSequence Nothing _ = []
-scatterSequence (Just m) value =
+scatterSequence (Just m) value = -- todo: try re-writing this as an unfold.
 	let value' =
 		if ((value .&. 1) /= 0)
 			then ((value `shiftR` 1) `xor` m)
