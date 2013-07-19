@@ -1,6 +1,6 @@
 -- A very simplistic BitSet implementation.
 -- Don't rely on it for anything serious
-module BitSet (empty, set, isSet, anySet, allSet,    oneBit) where 
+module BitSet (BitSet, empty, set, isSet, anySet, allSet, setOf) where 
 
 import Data.Bits
 import Data.Word
@@ -22,11 +22,22 @@ oneBit x = unfoldr (blocksFor x) 1
 		| block == 1 + (index `div` 64) = Just (fromIntegral 1 `shiftL` (fromIntegral index `mod` 64), (block + 1))
 		| otherwise = Nothing
 
-
+-- return a BitSet with all the listed bits set, others not set.
+setOf :: (Integral a) => [a] -> BitSet
+setOf list = make list empty
+	where
+		make :: (Integral a) => [a] -> BitSet -> BitSet
+		make (x:xs) bs = make xs (set x bs)
+		make [] bs = bs
 
 -- return the input bitstring with bit (x) set, regardless of if it was set before.
-set :: Integral a => a  -> BitSet -> BitSet
+set :: Integral a => a -> BitSet -> BitSet
 set x (BitSet bs) = BitSet (zipLong 0 (.|.) (oneBit x) bs)
+
+-- bitwise OR of two sets
+setOR :: BitSet -> BitSet -> BitSet
+setOR bsa ...
+
 
 -- returns true if bit (x) of the bitstring is set
 isSet :: Ord a => a  -> BitSet -> Bool
