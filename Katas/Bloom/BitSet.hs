@@ -16,11 +16,11 @@ empty = BitSet []
 oneBit :: (Integral a) => a -> [Word64]
 oneBit x = unfoldr (blocksFor x) 1
 	where
-	blocksFor :: (Integral b) => b -> b -> Maybe (Word64, b)
-	blocksFor index block 
-		| block < 1 + (index `div` 64)  = Just (0, (block + 1))
-		| block == 1 + (index `div` 64) = Just (fromIntegral 1 `shiftL` (fromIntegral index `mod` 64), (block + 1))
-		| otherwise = Nothing
+		blocksFor :: (Integral b) => b -> b -> Maybe (Word64, b)
+		blocksFor index block 
+			| block < 1 + (index `div` 64)  = Just (0, (block + 1))
+			| block == 1 + (index `div` 64) = Just (fromIntegral 1 `shiftL` (fromIntegral index `mod` 64), (block + 1))
+			| otherwise = Nothing
 
 -- return a BitSet with all the listed bits set, others not set.
 setOf :: (Integral a) => [a] -> BitSet
@@ -36,12 +36,16 @@ set x (BitSet bs) = BitSet (zipLong 0 (.|.) (oneBit x) bs)
 
 -- bitwise OR of two sets
 setOR :: BitSet -> BitSet -> BitSet
-setOR bsa ...
+setOR (BitSet a) (BitSet b) = BitSet (zipLong 0 (.|.) a b)
 
 
 -- returns true if bit (x) of the bitstring is set
-isSet :: Ord a => a  -> BitSet -> Bool
-isSet x (BitSet bs) = False
+isSet :: Int -> BitSet -> Bool
+isSet x (BitSet bs) = if exists then (bs !! block) .&. mask /= 0 else False
+	where
+		mask = 1 `shiftL` (x `mod` 64) :: Word64
+		block = x `div` 64
+		exists = (length bs) > block
 
 -- given a set of positions, returns true if any are set
 anySet :: Ord a => [a] -> BitSet -> Bool
