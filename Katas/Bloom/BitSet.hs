@@ -1,6 +1,6 @@
 -- A very simplistic BitSet implementation.
 -- Don't rely on it for anything serious
-module BitSet (BitSet, empty, set, isSet, anySet, allSet, setOf) where 
+module BitSet (BitSet, empty, set, isSet, anySet, allSet, setOf, toRaw) where 
 
 import Data.Bits
 import Data.Word
@@ -8,13 +8,17 @@ import Data.List
 
 newtype BitSet = BitSet [Word64] deriving (Show, Eq)
 
+-- return a list of 64bit words used to store the bit set
+toRaw :: BitSet -> [Word64]
+toRaw (BitSet bs) = bs
+
 -- empty bitstring, no elements set
 empty :: BitSet
 empty = BitSet []
 
 -- given a bit position (x), return a BitSet with only that bit set
-oneBit :: (Integral a) => a -> [Word64]
-oneBit x = unfoldr (blocksFor x) 1
+oneBit :: (Integral a) => a -> BitSet
+oneBit x = BitSet (unfoldr (blocksFor x) 1)
 	where
 		blocksFor :: (Integral b) => b -> b -> Maybe (Word64, b)
 		blocksFor index block 
@@ -32,11 +36,11 @@ setOf list = make list empty
 
 -- return the input bitstring with bit (x) set, regardless of if it was set before.
 set :: Integral a => a -> BitSet -> BitSet
-set x (BitSet bs) = BitSet (zipLong 0 (.|.) (oneBit x) bs)
+set x bs = setOp (.|.) (oneBit x) bs
 
 -- bitwise OR of two sets
-setOR :: BitSet -> BitSet -> BitSet
-setOR (BitSet a) (BitSet b) = BitSet (zipLong 0 (.|.) a b)
+setOp :: (Word64 -> Word64 -> Word64) -> BitSet -> BitSet -> BitSet
+setOp f (BitSet a) (BitSet b) = BitSet (zipLong 0 (f) a b)
 
 
 -- returns true if bit (x) of the bitstring is set
@@ -48,12 +52,14 @@ isSet x (BitSet bs) = if exists then (bs !! block) .&. mask /= 0 else False
 		exists = (length bs) > block
 
 -- given a set of positions, returns true if any are set
-anySet :: Ord a => [a] -> BitSet -> Bool
-anySet xs bs = False
+anySet :: Integral a => [a] -> BitSet -> Bool
+anySet (x:xs) bs = if (isSet (fromIntegral x) bs) then True else anySet xs bs
+anySet [] bs = False
 
 -- given a set of positions, returns true iff all are set.
-allSet :: Ord a => [a] -> BitSet -> Bool
-allSet xs bs = False
+allSet :: Integral a => [a] -> BitSet -> Bool
+allSet (x:xs) bs = if (not $ isSet (fromIntegral x) bs) then False else allSet xs bs
+allSet [] bs = True
 
 -- like zipWith, but uses length of longest list, not shortest
 -- if lists are not equal, the id (x) is used as a proxy
