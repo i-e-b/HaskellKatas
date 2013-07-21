@@ -5,6 +5,13 @@ module Murmur (murmur32) where
 import Data.List
 import Data.Word
 import Data.Bits
+import System.Random
+
+-- An infinite list of Word32, with a pre-selected seed.
+-- This is very deterministic!
+seededList :: [Word32]
+seededList = let sl_gen gn@(i, g) = (w32' i):(sl_gen $ next g)
+	     in  sl_gen (0x9747b28c, mkStdGen 0x9747b28c)
 
 -- Hash a list of bytes, given a seed (0x9747b28c is a reasonable seed)
 murmur32 :: [Word8] -> Word32 -> Word32
@@ -23,7 +30,8 @@ split4 i = (f n 0 i, f n n i, f n (2 * n) i, f (2 * n) (3 * n) i)
 		f a b = take a . drop b
 
 mix = 0x5bd1e995
-
+w32' :: Integral a => a -> Word32
+w32' = fromIntegral
 p' :: Word8 -> Word32
 p' = fromIntegral
 
