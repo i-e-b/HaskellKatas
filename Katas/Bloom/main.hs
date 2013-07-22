@@ -35,7 +35,9 @@ addString bl str = Bloom {set = ((set bl) `setOR` (setOf bitsToSet)), seeds = (s
 
 -- Look for a value in a bloom filter
 mightContain :: Bloom -> String -> Bool
-mightContain inp str = (set inp) `setAND` (set $ addString (emptyClone inp) str) == (set inp)
+mightContain inp str = 
+	let testSet = set $ addString (emptyClone inp) str
+	in  (set inp) `setAND` (testSet) == (testSet)
 		
 -- Limit a hash value to the max size of a bloom filter
 limitForBloom :: Bloom -> Word32 -> Int
