@@ -1,6 +1,6 @@
 -- A very simplistic BitSet implementation.
 -- Don't rely on it for anything serious
-module BitSet (BitSet, empty, set, isSet, anySet, allSet, setOf, toRaw) where 
+module BitSet (BitSet, empty, addBit, isSet, anySet, allSet, setOf, toRaw, setOR, setAND) where 
 
 import Data.Bits
 import Data.Word
@@ -31,17 +31,24 @@ setOf :: (Integral a) => [a] -> BitSet
 setOf list = make list empty
 	where
 		make :: (Integral a) => [a] -> BitSet -> BitSet
-		make (x:xs) bs = make xs (set x bs)
+		make (x:xs) bs = make xs (addBit x bs)
 		make [] bs = bs
 
 -- return the input bitstring with bit (x) set, regardless of if it was set before.
-set :: Integral a => a -> BitSet -> BitSet
-set x bs = setOp (.|.) (oneBit x) bs
+addBit :: Integral a => a -> BitSet -> BitSet
+addBit x bs = setOp (.|.) (oneBit x) bs
 
--- bitwise OR of two sets
+-- bitwise operation on two sets
 setOp :: (Word64 -> Word64 -> Word64) -> BitSet -> BitSet -> BitSet
 setOp f (BitSet a) (BitSet b) = BitSet (zipLong 0 (f) a b)
 
+-- Join two sets with a boolean OR
+setOR :: BitSet -> BitSet -> BitSet
+setOR = setOp (.|.)
+
+-- Join two sets with a boolean AND
+setAND :: BitSet -> BitSet -> BitSet
+setAND = setOp (.&.)
 
 -- returns true if bit (x) of the bitstring is set
 isSet :: Int -> BitSet -> Bool

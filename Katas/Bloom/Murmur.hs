@@ -1,6 +1,6 @@
 -- Rough murmur2 hash, converted from some Java on the 'net
 -- Don't rely on it for anything serious
-module Murmur (murmur32) where 
+module Murmur (murmur32, seededList) where 
 
 import Data.List
 import Data.Word
