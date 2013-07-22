@@ -8,15 +8,32 @@ import Data.Word
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as Convert
 
+{- Use like this:
+
+ghci> let empty = sizedBloom 1000 10
+ghci> let test = addString "One" . addString "Two" $ addString "Three" empty
+ghci> mightContain test "One"
+True
+ghci> mightContain test "Two"
+True
+ghci> mightContain test "Threo"
+False
+ghci> mightContain test "Three"
+True
+ghci> mightContain test "Throw"
+False
+
+-}
+
 type HashSeed = Word32
 data Bloom = Bloom
 	{ set :: BitSet
 	, seeds ::[HashSeed]
 	, size :: Int } deriving (Show, Eq)
 
--- return a default empty bloom filter of size 1000 with 10 hashes
+-- return a default empty bloom filter of size 200 with 10 hashes
 emptyBloom :: Bloom
-emptyBloom = sizedBloom 1000 10
+emptyBloom = sizedBloom 200 10
 
 -- create an empty filter with the same hash seeds and size of another bloom filter
 emptyClone :: Bloom -> Bloom
@@ -28,16 +45,16 @@ sizedBloom :: Int -> Int -> Bloom
 sizedBloom maxSize hashCount = Bloom {set = empty, seeds = take hashCount seededList, size = maxSize}
 
 -- Add a byte-string value to a bloom filter
-addString :: Bloom -> String -> Bloom
-addString bl str = Bloom {set = ((set bl) `setOR` (setOf bitsToSet)), seeds = (seeds bl), size = (size bl)}
-	where
-		bitsToSet = map (limitForBloom bl) $ zipWith (murmur32) (repeat $ B.unpack (Convert.pack str)) (seeds bl)
+addString :: String -> Bloom -> Bloom
+addString str bl = Bloom {set = ((set bl) `setOR` (setOf $ bitsToSet bl str)), seeds = (seeds bl), size = (size bl)}
+
+bitsToSet :: Bloom -> String -> [Int]
+bitsToSet bl str = map (limitForBloom bl) $ zipWith (murmur32) (repeat $ B.unpack (Convert.pack str)) (seeds bl)
 
 -- Look for a value in a bloom filter
 mightContain :: Bloom -> String -> Bool
-mightContain inp str = 
-	let testSet = set $ addString (emptyClone inp) str
-	in  (set inp) `setAND` (testSet) == (testSet)
+mightContain inp str = testSet `isSubset` (set inp)
+	where testSet = (set $ addString str (emptyClone inp))
 		
 -- Limit a hash value to the max size of a bloom filter
 limitForBloom :: Bloom -> Word32 -> Int

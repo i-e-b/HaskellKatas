@@ -1,12 +1,24 @@
 -- A very simplistic BitSet implementation.
 -- Don't rely on it for anything serious
-module BitSet (BitSet, empty, addBit, isSet, anySet, allSet, setOf, toRaw, setOR, setAND) where 
+module BitSet (BitSet, empty, addBit, isSet, anySet, allSet, setOf, toRaw, setOR, isSubset) where 
 
 import Data.Bits
 import Data.Word
 import Data.List
+import Numeric
+import Data.Char
 
-newtype BitSet = BitSet [Word64] deriving (Show, Eq)
+newtype BitSet = BitSet [Word64] deriving (Eq)
+
+instance Show BitSet where
+	show (BitSet bs) = showBits bs
+
+-- show a 64 bit word in binary, padded to 64 bits.
+showBits :: [Word64] -> String
+showBits [] = []
+showBits (x:xs) = (padTo64 $ showIntAtBase 2 intToDigit (x) "") ++ (showBits xs)
+	where
+		padTo64 str = (replicate (64 - (length str)) '0') ++ str
 
 -- return a list of 64bit words used to store the bit set
 toRaw :: BitSet -> [Word64]
@@ -46,10 +58,6 @@ setOp f (BitSet a) (BitSet b) = BitSet (zipLong 0 (f) a b)
 setOR :: BitSet -> BitSet -> BitSet
 setOR = setOp (.|.)
 
--- Join two sets with a boolean AND
-setAND :: BitSet -> BitSet -> BitSet
-setAND = setOp (.&.)
-
 -- returns true if bit (x) of the bitstring is set
 isSet :: Int -> BitSet -> Bool
 isSet x (BitSet bs) = if exists then (bs !! block) .&. mask /= 0 else False
@@ -67,6 +75,12 @@ anySet [] bs = False
 allSet :: Integral a => [a] -> BitSet -> Bool
 allSet (x:xs) bs = if (not $ isSet (fromIntegral x) bs) then False else allSet xs bs
 allSet [] bs = True
+
+-- check if one bitset is a subset of another
+isSubset :: BitSet -> BitSet -> Bool
+isSubset (BitSet (sb:subset)) (BitSet (su:superset)) = if (sb .&. su) /= sb then False else (isSubset (BitSet subset) (BitSet superset))
+isSubset (BitSet []) _ = True
+isSubset _ (BitSet []) = False
 
 -- like zipWith, but uses length of longest list, not shortest
 -- if lists are not equal, the id (x) is used as a proxy

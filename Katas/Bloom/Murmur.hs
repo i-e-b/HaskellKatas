@@ -32,15 +32,15 @@ split4 i = (f n 0 i, f n n i, f n (2 * n) i, f (2 * n) (3 * n) i)
 mix = 0x5bd1e995
 w32' :: Integral a => a -> Word32
 w32' = fromIntegral
-p' :: Word8 -> Word32
-p' = fromIntegral
+w8w32' :: Word8 -> Word32
+w8w32' = fromIntegral
 
 -- Perform all rounds on the data, given a starting hash
 murmurRounds :: ([Word8],[Word8],[Word8],[Word8]) -> Word32 -> Word32
 murmurRounds ((w:ws), (x:xs), (y:ys), (z:zs)) hash = murmurRounds (ws, xs, ys, zs) (murmurRound (w, x, y, z) hash)
-murmurRounds ([],[],[], x:y:z:[]) hash = murmurRounds ([],[],[], x:y:[]) (hash `xor` (p' z `shiftL` 16))
-murmurRounds ([],[],[], x:y:[]) hash = murmurRounds ([],[],[], x:[]) (hash `xor` (p' y `shiftL` 16))
-murmurRounds ([],[],[], x:[]) hash = murmurRounds ([],[],[],[]) ((hash `xor` p' x) * mix)
+murmurRounds ([],[],[], x:y:z:[]) hash = murmurRounds ([],[],[], x:y:[]) (hash `xor` (w8w32' z `shiftL` 16))
+murmurRounds ([],[],[], x:y:[]) hash = murmurRounds ([],[],[], x:[]) (hash `xor` (w8w32' y `shiftL` 16))
+murmurRounds ([],[],[], x:[]) hash = murmurRounds ([],[],[],[]) ((hash `xor` w8w32' x) * mix)
 murmurRounds _ hash = 
 	let h' = (hash `xor` (hash `shiftR` 13)) * mix
 	in  h' `xor` (h' `shiftR` 15) 
@@ -50,7 +50,7 @@ murmurRounds _ hash =
 murmurRound :: (Word8, Word8, Word8, Word8) -> Word32 -> Word32
 murmurRound (w, x, y, z) hash = h'
 	where
-		join a b c d = (p' a) + ((p' b) `shiftL` 8) + ((p' c) `shiftL` 16) + ((p' d) `shiftL` 24) 
+		join a b c d = (w8w32' a) + ((w8w32' b) `shiftL` 8) + ((w8w32' c) `shiftL` 16) + ((w8w32' d) `shiftL` 24) 
 		k = (join w x y z)
 		r = 24
 		a = (k * mix) `xor` (k `rotateR` r)
