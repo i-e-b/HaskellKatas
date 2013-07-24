@@ -1,6 +1,8 @@
 
 import Codec.Picture
 import Codec.Picture.Types (dynamicMap)
+import qualified Data.Vector.Storable as V
+import Data.Word
 
 main = do
 	img <- readImage "./test.png"
@@ -13,6 +15,14 @@ myInfoImage (Right img) = "Got an image: " ++ (show $ width img) ++ " x " ++ (sh
 	where
 		width = dynamicMap imageWidth
 		height = dynamicMap imageHeight
+
+whatever :: Either String DynamicImage -> Maybe DynamicImage
+whatever (Right img) = Just img
+whatever _ = Nothing
+
+rgbVect :: Maybe DynamicImage -> Maybe (V.Vector Word8) 
+rgbVect (Just (ImageRGB8 a)) = Just (imageData a)
+rgbVect _ = Nothing
 
 kind :: DynamicImage -> String
 kind (ImageY8 a) = "Greyscale"
