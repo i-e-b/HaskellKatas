@@ -24,7 +24,7 @@ parseXml fileName = docContent $ xmlParse ("error in " ++ fileName) fileName
 
 -- Concatenate all text (without elements) from the given nodes
 innerText :: Nodes -> String
-innerText nodes = concat $ map verbatim (map (keep /> txt) nodes)
+innerText nodes = concatMap verbatim (map (keep /> txt) nodes)
 
 {-- count deal tags
 testFunc doc = show $ foldr (+) 0 (allMatches doc)
@@ -57,7 +57,7 @@ allDeals :: Node -> Nodes
 allDeals = allTags "Deal"
 
 senderId :: Node -> Nodes
-senderId = ((allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
-	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId"))
+senderId = (allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
+	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId")
 
 

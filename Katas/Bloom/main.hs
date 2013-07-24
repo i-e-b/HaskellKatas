@@ -37,7 +37,7 @@ emptyBloom = sizedBloom 200 10
 
 -- create an empty filter with the same hash seeds and size of another bloom filter
 emptyClone :: Bloom -> Bloom
-emptyClone b = Bloom {set = empty, seeds = seeds b, size = size b}
+emptyClone b = b {set = empty}
 	
 -- Given a count of hash functions and a maximum bitset size,
 -- return an empty bloom filter. 1000 and 10 are reasonable defaults
