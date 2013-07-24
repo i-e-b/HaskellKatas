@@ -1,2 +1,2 @@
 #!/bin/bash
-./main | padsp tee | aplay
+runhaskell main.hs | padsp tee | aplay

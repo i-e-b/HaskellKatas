@@ -1,3 +1,5 @@
+Try `sudo ./run`
+
 This outputs 8kHz, 8bit pcm data.
 For Ubuntu and most other modern Linux:
 
