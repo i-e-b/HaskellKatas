@@ -2,6 +2,11 @@
 
 import Data.List
 import Data.Maybe
+import qualified Data.Trie as Tr -- requires `cabal install bytestring-trie`
+import qualified Data.ByteString as B
+import qualified Data.ByteString.Char8 as Bs
+
+-- possibly also try [ https://gist.github.com/orclev/1929451 ]
 
 type Dictionary = [String]
 type WordList = [String]
@@ -11,7 +16,7 @@ main = do
 	putStrLn "Source sentence:"
 	content <- readFile "TinyDictionary.txt"
 	input <- getLine
-	putStrLn . unwords $ anagrams (words content) input
+	putStrLn . unlines $ anagrams (words content) input
 
 -- given a dictionary and an input, output all anagrams of the input
 anagrams :: Dictionary -> String -> WordList
