@@ -18,8 +18,17 @@ soundFunc t = if ((t `mod` 100) < 20) then 0 else 255
 -- simple little tune
 --soundFunc = (\t -> t * (((t `shiftR` 12) .|. (t `shiftR` 8)) .&. (63 .&. (t `shiftR` 4))))
 
+bitwiseNoise :: [Word32]
+bitwiseNoise = map mf noise
+	where
+		mf n = if (n .&. 1 == 1) then 255 else 0
+		
 
-
+noise :: [Word16]
+noise = noiseFunc 2
+	where
+		noiseFunc n = n : (noiseFunc $ nextN n)
+		nextN n' = (n' `shiftR` 1) + ((n' .&. 1) `xor` ((n' .&. 2) `shiftR` 1) `shiftL` 14)
 
 
 choons :: ByteString
