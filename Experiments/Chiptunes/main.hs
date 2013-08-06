@@ -10,7 +10,6 @@ mapPack :: (Word32 -> Word32) -> ByteString
 mapPack f = repack $ map f seed
 
 soundFunc :: Word32 -> Word32
-
 -- square wave with variable duty
 soundFunc t = if ((t `mod` 100) < 20) then 0 else 255
 
@@ -19,20 +18,23 @@ soundFunc t = if ((t `mod` 100) < 20) then 0 else 255
 --soundFunc = (\t -> t * (((t `shiftR` 12) .|. (t `shiftR` 8)) .&. (63 .&. (t `shiftR` 4))))
 
 bitwiseNoise :: [Word32]
-bitwiseNoise = map mf noise
+bitwiseNoise = map mf (noise 2 256)
 	where
 		mf n = if (n .&. 1 == 1) then 255 else 0
 		
-
-noise :: [Word16]
-noise = noiseFunc 2
+-- roughly the NES noise func. A seed of 2 and len of 32768 is the default
+-- a really short len give square wave tones. Seed has minor effects,
+-- play with the len a lot
+noise :: Word16 -> Int -> [Word16]
+noise seed len = (concat . repeat . take len) $ noiseFunc seed
 	where
 		noiseFunc n = n : (noiseFunc $ nextN n)
 		nextN n' = (n' `shiftR` 1) + ((n' .&. 1) `xor` ((n' .&. 2) `shiftR` 1) `shiftL` 14)
 
 
 choons :: ByteString
-choons = mapPack soundFunc
+choons = repack bitwiseNoise
+--choons = mapPack soundFunc
 
 --choons :: ByteString
 --choons = repack $ map (\t -> t * (((t `shiftR` 12) .|. (t `shiftR` 8)) .&. (63 .&. (t `shiftR` 4)))) seed
