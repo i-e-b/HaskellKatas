@@ -24,8 +24,9 @@ main = do
 	putStrLn . unlines $ anagrams (groupedDictionary . words $ content) input
 	
 anagrams :: GroupedDictionary -> String -> WordList
-anagrams dic inpStr = nub . (map unwords) . resplit . unroll $ (buildMatchTree dic $ crush inpStr) 
+anagrams dic inpStr = nub . cleanup . resplit . unroll $ (buildMatchTree dic $ crush inpStr) 
 	where
+		cleanup = map (unwords . sort . (filter (/= "")))
 		resplit = concatMap ( groupBy (\_ y -> y /= ""))
 
 -- traverse a match tree and build lists of dictionary word paths
