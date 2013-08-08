@@ -39,7 +39,7 @@ mf _ [] = M.empty
 mf dic remains = M.fromList [ (x, m dic (remains \\ x)) | x <- (withinSize dic remains), remains `containsWord` x ]
 	where
 		withinSize d str = concatMap (snd) $ takeWhile (lte str) d
-		lte s = (< (length s)) . fst
+		lte s = (<= (length s)) . fst
 		containsWord remains = all (`elem` remains)  -- "hello world" `containsWord` "ol dw" == true
 
 -- fromList [("word", m gd (s \\ "word")), ("glob", m gd (s \\ "glob")]
