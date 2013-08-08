@@ -6,6 +6,7 @@
 import Data.List
 import Data.Maybe
 import Data.Function
+import Data.Traversable
 import qualified Data.Map as M
 
 type Dictionary = [String]
@@ -24,28 +25,25 @@ main = do
 	putStrLn . unlines $ anagrams (groupedDictionary . words $ content) input
 	
 anagrams :: GroupedDictionary -> String -> WordList
-anagrams dic inpStr = unroll (m dic (crush inpStr))
+anagrams dic inpStr = unroll (buildMatchTree dic (crush inpStr))
 
 unroll :: Match -> WordList
 unroll = undefined
 
--- (m) and (mf) mutually build the match tree
-m :: GroupedDictionary -> String -> Match
-m dic s = Match {remains = s, matches = (mf dic s)}
 
--- for all dicts less than string length, Map (dictWord -> m gd s-with-dict-Word-removed)
-mf :: GroupedDictionary -> String -> M.Map String Match
-mf _ [] = M.empty
-mf dic remains = M.fromList [ (x, m dic (remains \\ x)) | x <- (withinSize dic remains), remains `containsWord` x ]
+buildMatchTree :: GroupedDictionary -> String -> Match
+buildMatchTree gDic srcStr = m gDic srcStr
 	where
+		m :: GroupedDictionary -> String -> Match
+		m dic s = Match {remains = s, matches = (mf dic s)}
+
+		mf :: GroupedDictionary -> String -> M.Map String Match
+		mf _ [] = M.empty
+		mf dic remains = M.fromList [ (x, m dic (remains \\ x)) | x <- (withinSize dic remains), remains `containsWord` x ]
+		
 		withinSize d str = concatMap (snd) $ takeWhile (lte str) d
 		lte s = (<= (length s)) . fst
 		containsWord remains = all (`elem` remains)  -- "hello world" `containsWord` "ol dw" == true
-
--- fromList [("word", m gd (s \\ "word")), ("glob", m gd (s \\ "glob")]
--- "hello" \\ "oel" == "hl"
---lkup dic remains = [ (x, remains \\ x) | x <- dic, remains `containsWord` x ]
-
 
 -- remove whitespace from a string
 crush :: String -> String
