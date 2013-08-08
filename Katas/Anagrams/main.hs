@@ -13,7 +13,7 @@ type WordList = [String]
 
 data Match = Match { remains :: [Char]             -- the remaining characters of the input. At root, this is the input. At leafs it is []
                    , matches :: M.Map String Match -- map of dictionary word matched to sub-matches
-				   } deriving (Show)
+                   } deriving (Show)
 --
 
 main :: IO ()
@@ -29,12 +29,22 @@ anagrams dic inpStr = concat $ unroll (buildMatchTree dic (crush inpStr))
 -- traverse a match tree and build lists of dictionary word paths
 -- any paths that end in non-empty 'remains' are invalid.
 unroll :: Match -> [WordList]
-unroll = undefined 
--- Depth-first-search. Where on a leaf, if (deadEnd) then (nothing) else (add to accumulator)
+unroll = accumResults [[]]
 
+-- Depth-first-search. Where on a leaf, if (deadEnd) then (nothing) else (add to accumulator)
 -- something like this?
-accumResults :: [WordList] -> Match -> [WordList]
-accumResults acc m = [ accumResults (acc ++ (peel x)) ...? | x <- matches m, not deadend m ...]
+accumResults :: [String] -> Match -> [WordList]
+accumResults path match
+	| deadEnd match = []
+	| isLeaf match = [path]
+	| otherwise = map mapper (rose match)
+	where
+		rose :: Match -> [(String, Match)]
+		rose = M.toList . matches -- > (path elem, sub match)
+
+		mapper :: (String, Match) -> WordList
+		mapper (p, submap) = concat $ accumResults (p : path) submap
+
 
 isLeaf :: Match -> Bool
 isLeaf m = M.null (matches m)
