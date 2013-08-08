@@ -14,7 +14,7 @@ type WordList = [String]
 
 data Match = Match { remains :: [Char]             -- the remaining characters of the input. At root, this is the input. At leafs it is []
                    , matches :: M.Map String Match -- map of dictionary word matched to sub-matches
-				   }
+				   } deriving (Show)
 
 main :: IO ()
 main = do
@@ -24,18 +24,32 @@ main = do
 	putStrLn . unlines $ anagrams (groupedDictionary . words $ content) input
 	
 anagrams :: GroupedDictionary -> String -> WordList
-anagrams gd s = map show gd
+anagrams dic inpStr = unroll (m dic (crush inpStr))
 
+unroll :: Match -> WordList
+unroll = undefined
+
+-- (m) and (mf) mutually build the match tree
 m :: GroupedDictionary -> String -> Match
-m gd s = Match {remains = s, matches = (mf gd s)}
+m dic s = Match {remains = s, matches = (mf dic s)}
 
 -- for all dicts less than string length, Map (dictWord -> m gd s-with-dict-Word-removed)
 mf :: GroupedDictionary -> String -> M.Map String Match
-mf gd s = 
+mf _ [] = M.empty
+mf dic remains = M.fromList [ (x, m dic (remains \\ x)) | x <- (withinSize dic remains), remains `containsWord` x ]
+	where
+		withinSize d str = concatMap (snd) $ takeWhile (lte str) d
+		lte s = (< (length s)) . fst
+		containsWord remains = all (`elem` remains)  -- "hello world" `containsWord` "ol dw" == true
+
 -- fromList [("word", m gd (s \\ "word")), ("glob", m gd (s \\ "glob")]
 -- "hello" \\ "oel" == "hl"
--- containsWord remains = and . map (`elem` remains)  -- > "hello world" `containsWord` "world"
+--lkup dic remains = [ (x, remains \\ x) | x <- dic, remains `containsWord` x ]
 
+
+-- remove whitespace from a string
+crush :: String -> String
+crush = concat . words
 
 -- Take a list of words and give a list where words of the same length are grouped together, with that length
 groupedDictionary :: WordList -> GroupedDictionary
