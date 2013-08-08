@@ -24,7 +24,9 @@ main = do
 	putStrLn . unlines $ anagrams (groupedDictionary . words $ content) input
 	
 anagrams :: GroupedDictionary -> String -> WordList
-anagrams dic inpStr = concat $ unroll (buildMatchTree dic (crush inpStr))
+anagrams dic inpStr = nub . (map unwords) . resplit . unroll $ (buildMatchTree dic $ crush inpStr) 
+	where
+		resplit = concatMap ( groupBy (\_ y -> y /= ""))
 
 -- traverse a match tree and build lists of dictionary word paths
 -- any paths that end in non-empty 'remains' are invalid.
@@ -68,11 +70,16 @@ buildMatchTree gDic srcStr = m gDic srcStr
 
 		mf :: GroupedDictionary -> String -> M.Map String Match
 		mf _ [] = M.empty
-		mf dic remains = M.fromList [ (x, m dic (remains \\ x)) | x <- (withinSize dic remains), remains `containsWord` x ]
+		mf dic remains = M.fromList [ (x, m dic (remains \\ x)) | x <- (withinSize dic remains), isIntersect x remains]
 		
 		withinSize d str = concatMap (snd) $ takeWhile (lte str) d
 		lte s = (<= (length s)) . fst
-		containsWord remains = all (`elem` remains)  -- "hello world" `containsWord` "ol dw" == true
+
+-- true iff haystack contains the elements of needle in gte number
+isIntersect :: (Eq a) => [a] -> [a] -> Bool
+isIntersect n [] = n == []
+isIntersect [] _ = True
+isIntersect (needle:ns) haystack = if (needle `elem` haystack) then (isIntersect ns (delete needle haystack)) else False
 
 -- remove whitespace from a string
 crush :: String -> String
