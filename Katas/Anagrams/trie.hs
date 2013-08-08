@@ -1,5 +1,7 @@
 -- from https://gist.github.com/orclev/1929451
 
+--module Trie (Trie, emptyTrie) where
+
 import Data.Maybe
 import Control.Monad (liftM)
 import Data.List (isPrefixOf)

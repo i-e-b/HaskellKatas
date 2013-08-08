@@ -2,11 +2,8 @@
 
 import Data.List
 import Data.Maybe
-import qualified Data.Trie as Tr -- requires `cabal install bytestring-trie`
 import qualified Data.ByteString as B
 import qualified Data.ByteString.Char8 as Bs
-
--- possibly also try [ https://gist.github.com/orclev/1929451 ]
 
 type Dictionary = [String]
 type WordList = [String]
