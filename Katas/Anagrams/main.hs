@@ -38,8 +38,8 @@ unroll = accumResults [[]]
 -- something like this?
 accumResults :: [String] -> Match -> [WordList]
 accumResults path match
-	| deadEnd match = []
 	| isLeaf match = [path]
+	| deadEnd match = []
 	| otherwise = map mapper (rose match)
 	where
 		rose :: Match -> [(String, Match)]
@@ -50,7 +50,7 @@ accumResults path match
 
 
 isLeaf :: Match -> Bool
-isLeaf m = M.null (matches m)
+isLeaf m = (M.null (matches m)) && (remains m == [])
 
 -- If true, this is the leaf of a path that is no good
 deadEnd :: Match -> Bool

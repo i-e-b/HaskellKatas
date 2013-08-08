@@ -10,6 +10,7 @@ i.e.
 [t,h,e,m,i,c,e] = [[the,mice],[them,ice]]
 
 The `main.hs` algorithm works reasonably well, even if it's a bit messy,
+
 Example :
 ```
 Main> main
