@@ -2,14 +2,12 @@
 import Data.List
 import Data.Maybe
 import Data.Function
-import Data.Traversable
-import Control.Applicative
+import Control.Monad.Writer
 import qualified Data.Map as M
 
 type Dictionary = [String]
 type GroupedDictionary = [(Int, Dictionary)] -- (length of each entry, entries)
 type WordList = [String]
-
 
 data Match = Match { remains :: [Char]             -- the remaining characters of the input. At root, this is the input. At leafs it is []
                    , matches :: M.Map String Match -- map of dictionary word matched to sub-matches
@@ -24,37 +22,29 @@ main = do
 	putStrLn . unlines $ anagrams (groupedDictionary . words $ content) input
 	
 anagrams :: GroupedDictionary -> String -> WordList
-anagrams dic inpStr = nub . cleanup . resplit . unroll $ (buildMatchTree dic $ crush inpStr) 
-	where
-		cleanup = map (unwords . sort . (filter (/= "")))
-		resplit = concatMap ( groupBy (\_ y -> y /= ""))
+anagrams dic inpStr = nub . readResults $ (buildMatchTree dic $ crush inpStr)
+--
 
--- traverse a match tree and build lists of dictionary word paths
--- any paths that end in non-empty 'remains' are invalid.
-unroll :: Match -> [WordList]
-unroll = accumResults [[]]
+-- Read the successful match paths into a list of strings
+readResults :: Match -> [String]
+readResults m = snd $ runWriter (accumResults [] m)
 
--- Depth-first-search. Where on a leaf, if (deadEnd) then (nothing) else (add to accumulator)
--- something like this?
-accumResults :: [String] -> Match -> [WordList]
+-- Accumulate successful paths into a Writer.
+-- Works by following all paths through the tree accumulating the paths along 
+--  the way, and writing with 'tell' when a successful full path is found ('isLeaf')
+-- Non-successful paths (where there were letters left over with no dictionary matches)
+--  are ignored with no write.
+accumResults :: [String] -> Match -> Writer [String] ()
 accumResults path match
-	| isLeaf match = [path]
-	| deadEnd match = []
-	| otherwise = map mapper (rose match)
+	| isLeaf match = tell [(unwords . sort $ path)]
+	| deadEnd match = return ()
+	| otherwise = mapM_ (\(p, m) -> accumResults (p:path) m) (M.toList . matches $ match)
 	where
-		rose :: Match -> [(String, Match)]
-		rose = M.toList . matches -- > (path elem, sub match)
-
-		mapper :: (String, Match) -> WordList
-		mapper (p, submap) = concat $ accumResults (p : path) submap
-
-
-isLeaf :: Match -> Bool
-isLeaf m = (M.null (matches m)) && (remains m == [])
-
--- If true, this is the leaf of a path that is no good
-deadEnd :: Match -> Bool
-deadEnd m = (remains m /= []) && (M.keys (matches m) == []) -- end of the match path, but letters left over.
+		isLeaf :: Match -> Bool -- found a word set for all letters (no letters left, and is a leaf)
+		isLeaf m = (M.null (matches m)) && (remains m == [])
+		
+		deadEnd :: Match -> Bool -- If true, this is the leaf of a path that is no good
+		deadEnd m = (remains m /= []) && (M.keys (matches m) == []) -- end of the match path, but letters left over.
 
 -- get all the dictionary words at a single match point
 getPointWords :: Match -> [String]
