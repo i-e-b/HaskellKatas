@@ -1,4 +1,5 @@
 import Data.Time.Calendar
+import Data.List
 
 {-
  - A calendar printer.
@@ -21,5 +22,7 @@ intInput :: String -> IO Int
 intInput msg = putStrLn msg >> getLine >>= \s -> return (read s :: Int)
 
 calendarFor :: Int -> Int -> String
-calendarFor year width = "hello world"
+calendarFor year width = 
+    (intercalate ",") . ( map (show))
+    $ map (gregorianMonthLength (fromIntegral year)) [1..12]
 
