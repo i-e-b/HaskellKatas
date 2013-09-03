@@ -28,9 +28,24 @@ main = do
 intInput :: String -> IO Int
 intInput msg = putStrLn msg >> getLine >>= \s -> return (read s :: Int)
 
-calendarFor :: Int -> Int -> String
-calendarFor year width = unlines $ concatMap (monthToStrings year) [1..12]
 
+-- given a year and a screen width, output a display string for the year calendar
+{-
+calendarFor :: Int -> Int -> String
+calendarFor year width = unlines $ grouped
+	where
+		perRow = width `div` 21
+		grouped = map (\x -> clump year x perRow) [1,(perRow+1)..11]
+
+clump :: Int -> Int -> Int -> String
+clump year start row = unlines . (map (unwords)) . (tposed row) $ blockm year [start..(start+row)]
+
+tposed :: Int -> [[String]] -> [[String]]
+tposed r = concat . transpose . (groupsOf r)
+
+blockm :: Int -> [Int] -> [[String]]
+blockm year months = map (\m -> monthToStrings year m) months
+-}
 -- given a year and a month, draw a calendar block
 monthToStrings :: Int -> Int -> [String]
 monthToStrings year month = weekLines $ weeksOfMonth year month
@@ -54,7 +69,6 @@ weeksOfMonth year month = -- only first week to start with
 
 -- list of month lengths for a year
 monthLengths :: Int -> [Int]
-
 monthLengths year = map (gregorianMonthLength (fromIntegral year)) [1..12]
 
 -- given year and month, return the starting day of the week (mon = 1, sun =7)
@@ -62,3 +76,8 @@ monthStart :: Int -> Int -> Int
 monthStart year month = justDay $ toWeekDate (fromGregorian (fromIntegral year) month 1)
 	where justDay (_, _, day) = day
 
+-- group list into fixed length sublists
+groupsOf :: Int -> [a] -> [[a]]
+groupsOf 0 _ = undefined
+groupsOf _ [] = []
+groupsOf n xs = take n xs : groupsOf n (drop n xs)
