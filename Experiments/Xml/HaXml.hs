@@ -14,17 +14,18 @@ import Control.Applicative
 type Node = Content Posn
 type Nodes = [Content Posn]
 
+data Product = Product {sender::String, title::String} deriving (Show)
+
 exampleFile = "example.xml"
 
-main = readFile exampleFile >>= putStrLn . testFunc . parseXml
+main = readFile exampleFile >>= putStrLn . show . readProduct . parseXml
 
 -- Parse a DDEX XML string into nodes
 parseXml :: String -> Nodes
 parseXml fileName = docContent $ xmlParse ("error in " ++ fileName) fileName
 
--- Concatenate all text (without elements) from the given nodes
-innerText :: Nodes -> String
-innerText nodes = concatMap verbatim (map (keep /> txt) nodes)
+readProduct :: Nodes -> Product
+readProduct n = Product {sender=senderString n, title=productTitle n}
 
 {-- count deal tags
 testFunc doc = show $ foldr (+) 0 (allMatches doc)
@@ -33,10 +34,18 @@ testFunc doc = show $ foldr (+) 0 (allMatches doc)
 		-}
 
 -- find first preference sender id
-testFunc :: Nodes -> String
-testFunc doc = concat (innerText . senderId <$> doc)
+senderString :: Nodes -> String
+senderString doc = concat (innerText . senderId <$> doc)
+
+-- product type release title: ReleaseList/Release(/ReleaseType = Album|Bundle)/ReferenceTitle/TitleText -> inner text
+productTitle :: Nodes -> String
+productTitle doc = concat (innerText . releaseTitle <.> productRelease <$> doc)
 
 {- - General - -}
+-- Concatenate all text (without elements) from the given nodes
+innerText :: Nodes -> String
+innerText nodes = concatMap verbatim (map (keep /> txt) nodes)
+
 -- All matching tags in the document
 allTags :: String -> CFilter i
 allTags = deep . tag
@@ -58,6 +67,13 @@ allDeals = allTags "Deal"
 
 senderId :: Node -> Nodes
 senderId = (allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
-	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId")
+	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId") -- `|>|` means output right only if no left.
+
+releaseTitle :: Node -> Nodes
+releaseTitle = tag "ReferenceTitle" /> tag "TitleText"
+
+-- maybe also try `</` rather than `with`
+productRelease :: Node -> Nodes
+productRelease = (allTags "MessageHeader" /> tag "ReleaseList" /> tag "Release") `with` (tag "ReleaseType" /> literal "Album")
 
 
