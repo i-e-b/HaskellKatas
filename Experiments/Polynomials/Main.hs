@@ -10,7 +10,7 @@
 
 -- given x and a list of positive polynomial terms, evaluate a result
 evalPoly :: (Int, [Int]) -> (Int, Int)
-evalPoly x coeff =
+evalPoly (x, coeff) =
     let reduce[]    = 0
         reduce(h:t) = x * (reduce t) + h
     in  (x, reduce coeff)
