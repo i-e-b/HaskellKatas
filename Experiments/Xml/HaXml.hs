@@ -20,6 +20,13 @@ exampleFile = "example.xml"
 
 main = readFile exampleFile >>= putStrLn . show . readProduct . parseXml
 
+checkProduct :: IO ()
+checkProduct = do
+	doc <- readFile exampleFile 
+	putStrLn . show $ (struct {-. releaseTitle-} . productRelease <$> (parseXml doc))
+
+struct nodes = concatMap (verbatim) nodes
+
 -- Parse a DDEX XML string into nodes
 parseXml :: String -> Nodes
 parseXml fileName = docContent $ xmlParse ("error in " ++ fileName) fileName
@@ -39,7 +46,7 @@ senderString doc = concat (innerText . senderId <$> doc)
 
 -- product type release title: ReleaseList/Release(/ReleaseType = Album|Bundle)/ReferenceTitle/TitleText -> inner text
 productTitle :: Nodes -> String
-productTitle doc = concat (innerText . releaseTitle <.> productRelease <$> doc)
+productTitle doc = concat (innerText . productRelease <$> doc)
 
 {- - General - -}
 -- Concatenate all text (without elements) from the given nodes
@@ -69,11 +76,13 @@ senderId :: Node -> Nodes
 senderId = (allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
 	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId") -- `|>|` means output right only if no left.
 
-releaseTitle :: Node -> Nodes
-releaseTitle = tag "ReferenceTitle" /> tag "TitleText"
+releaseTitle :: Nodes -> Nodes
+releaseTitle = concatMap (allTags "ReferenceTitle" /> tag "TitleText")
 
 -- maybe also try `</` rather than `with`
 productRelease :: Node -> Nodes
-productRelease = (allTags "MessageHeader" /> tag "ReleaseList" /> tag "Release") `with` (tag "ReleaseType" /> literal "Album")
+productRelease = (allTags "ReleaseList" /> tag "Release") `with` (tag "ReleaseType" {-/> literal "Album"-})
+-- allTags doesn't actually filter on releasetype = album
+-- tag "ReleaseType" returns nothing.
 
 
