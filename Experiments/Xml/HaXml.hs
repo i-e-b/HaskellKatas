@@ -20,10 +20,10 @@ exampleFile = "example.xml"
 
 main = readFile exampleFile >>= putStrLn . show . readProduct . parseXml
 
-checkProduct :: IO ()
-checkProduct = do
-	doc <- readFile exampleFile 
-	putStrLn . show $ (struct {-. releaseTitle-} . productRelease <$> (parseXml doc))
+checkPath :: String -> (Node -> Nodes) -> IO ()
+checkPath file filter = do
+	doc <- readFile file 
+	putStrLn . show $ (struct . filter <$> (parseXml doc))
 
 struct nodes = concatMap (verbatim) nodes
 
