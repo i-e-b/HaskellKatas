@@ -46,7 +46,7 @@ senderString doc = concat (innerText . senderId <$> doc)
 
 -- product type release title: ReleaseList/Release(/ReleaseType = Album|Bundle)/ReferenceTitle/TitleText -> inner text
 productTitle :: Nodes -> String
-productTitle doc = concat (innerText . productRelease <$> doc)
+productTitle doc = concat (innerText . releaseTitle . productRelease <$> doc)
 
 {- - General - -}
 -- Concatenate all text (without elements) from the given nodes
@@ -79,10 +79,11 @@ senderId = (allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
 releaseTitle :: Nodes -> Nodes
 releaseTitle = concatMap (allTags "ReferenceTitle" /> tag "TitleText")
 
+matchingText :: String -> Node -> Nodes
+matchingText text = ifTxt (\s -> if (s == text) then keep else none) none
+
 -- maybe also try `</` rather than `with`
 productRelease :: Node -> Nodes
-productRelease = (allTags "ReleaseList" /> tag "Release") `with` (tag "ReleaseType" {-/> literal "Album"-})
--- allTags doesn't actually filter on releasetype = album
--- tag "ReleaseType" returns nothing.
+productRelease = (allTags "ReleaseList" /> tag "Release") `with` (allTags "ReleaseType" /> matchingText "Album")
 
 
