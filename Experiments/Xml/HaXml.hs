@@ -1,6 +1,6 @@
 
 -- requires: cabal install haxml
--- xml experiments
+-- Parsing DDEX documents in Haskell
 
 import Text.XML.HaXml
 import Text.XML.HaXml.Types
@@ -10,80 +10,31 @@ import Text.XML.HaXml.Combinators
 
 import Control.Applicative
 
--- (Node -> Nodes) == (CFilter Posn)
-type Node = Content Posn
-type Nodes = [Content Posn]
+import HaXmlHelper
+import DdexParsing
 
 data Product = Product {sender::String, title::String} deriving (Show)
 
-exampleFile = "example.xml"
-
-main = readFile exampleFile >>= putStrLn . show . readProduct . parseXml
-
+-- give a file name and a filter, will print resulting structure
 checkPath :: String -> (Node -> Nodes) -> IO ()
 checkPath file filter = do
 	doc <- readFile file 
-	putStrLn . show $ (struct . filter <$> (parseXml doc))
+	putStrLn . show $ (structure . filter <$> (parseXml doc))
 
-struct nodes = concatMap (verbatim) nodes
+exampleFile = "example.xml"
+main = readFile exampleFile >>= putStrLn . show . readProduct . parseXml
 
--- Parse a DDEX XML string into nodes
-parseXml :: String -> Nodes
-parseXml fileName = docContent $ xmlParse ("error in " ++ fileName) fileName
-
+-- Populate a product record from a ddex NewReleaseMessage
 readProduct :: Nodes -> Product
 readProduct n = Product {sender=senderString n, title=productTitle n}
 
-{-- count deal tags
-testFunc doc = show $ foldr (+) 0 (allMatches doc)
-	where
-		allMatches doc = fmap (length . allDeals) doc
-		-}
-
 -- find first preference sender id
 senderString :: Nodes -> String
-senderString doc = concat (innerText . senderId <$> doc)
+senderString = allText senderId
 
 -- product type release title: ReleaseList/Release(/ReleaseType = Album|Bundle)/ReferenceTitle/TitleText -> inner text
 productTitle :: Nodes -> String
-productTitle doc = concat (innerText . releaseTitle . productRelease <$> doc)
+productTitle = allText (releaseTitle . productRelease)
 
-{- - General - -}
--- Concatenate all text (without elements) from the given nodes
-innerText :: Nodes -> String
-innerText nodes = concatMap verbatim (map (keep /> txt) nodes)
-
--- All matching tags in the document
-allTags :: String -> CFilter i
-allTags = deep . tag
-
--- Get the name of the root element
-rootElementName :: Document a -> String
-rootElementName (Document _ _ elem _ ) = elemName elem
-	where
-		elemName (Elem (N n) _ _) = n
-		elemName (Elem (QN ns n) _ _) = n
-
--- Select New release message from an XML document
-docContent :: Document Posn -> Nodes
-docContent (Document _ _ elem _ ) = tag "ernm:NewReleaseMessage" $ CElem elem noPos
-
-{- - DDEX Specific - -}
-allDeals :: Node -> Nodes
-allDeals = allTags "Deal"
-
-senderId :: Node -> Nodes
-senderId = (allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
-	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId") -- `|>|` means output right only if no left.
-
-releaseTitle :: Nodes -> Nodes
-releaseTitle = concatMap (allTags "ReferenceTitle" /> tag "TitleText")
-
-matchingText :: String -> Node -> Nodes
-matchingText text = ifTxt (\s -> if (s == text) then keep else none) none
-
--- maybe also try `</` rather than `with`
-productRelease :: Node -> Nodes
-productRelease = (allTags "ReleaseList" /> tag "Release") `with` (allTags "ReleaseType" /> matchingText "Album")
 
 
