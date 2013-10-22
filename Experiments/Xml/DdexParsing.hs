@@ -2,7 +2,7 @@
 -- DDEX specific parsing functions.
 -- Use this to decompose an XML message into a working record set.
 module DdexParsing
-	( allDeals, senderId, releaseTitle, productRelease) where
+	( allDeals, senderId, releaseTitle, productRelease, releaseReferences, trackReleases) where
 
 import Text.XML.HaXml
 import Text.XML.HaXml.Types
@@ -25,6 +25,18 @@ senderId = (allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
 releaseTitle :: Nodes -> Nodes
 releaseTitle = concatMap (allTags "ReferenceTitle" /> tag "TitleText")
 
+-- Reference codes of a set of releases
+releaseReferences :: Nodes -> String
+releaseReferences = allText (allTags "ReleaseReference")
+
 -- Return all releases with Product-level release types ("Bundle", "Single", "Album", "VideoAlbum", "VideoSingle")
 productRelease :: Node -> Nodes
-productRelease = (allTags "ReleaseList" /> tag "Release") `with` (allTags "ReleaseType" /> matchingText "Album")
+productRelease = (allTags "ReleaseList" /> tag "Release") `with` (allTags "ReleaseType" /> matchingAnyText ["Bundle", "Single", "Album", "VideoAlbum", "VideoSingle"])
+
+-- Return all releases with track-level release types ("TrackRelease", "VideoTrackRelease")
+trackReleases :: Node -> Nodes
+trackReleases = (allTags "ReleaseList" /> tag "Release") `with` (allTags "ReleaseType" /> matchingAnyText ["TrackRelease", "VideoTrackRelease"])
+
+matchingAnyText :: [String] -> Node -> Nodes
+matchingAnyText [] = none
+matchingAnyText (t:ts) = (matchingText t) |>| (matchingAnyText ts)

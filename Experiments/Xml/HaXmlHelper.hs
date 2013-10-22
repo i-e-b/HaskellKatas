@@ -4,8 +4,8 @@ module HaXmlHelper
 	( Node
 	, Nodes
 	, parseXml
-	, structure
-	, allTags, allText, innerText
+	, structure, unroll
+	, allTags, allText, innerText, texts
 	, rootElementName
 	, matchingText) where
 
@@ -24,6 +24,13 @@ type Nodes = [Content Posn]
 allText :: (Node -> Nodes) -> Nodes -> String
 allText filter doc = concat (innerText . filter <$> doc)
 
+-- Given a filter and a source document, return a list of all matching inner-texts.
+texts :: (Node -> Nodes) -> Nodes -> [String]
+texts filter doc = innerText . filter <$> doc
+
+-- Given a filter and a set of nodes, return all sets of filter results
+unroll :: (Node -> Nodes) -> Nodes -> [Nodes]
+unroll filter nodes = map (filter) nodes
 
 -- Take a set of nodes and return an XML string of their contents
 structure :: Verbatim a => [a] -> [Char] -- Nodes -> String

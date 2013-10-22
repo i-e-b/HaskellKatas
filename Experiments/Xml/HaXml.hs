@@ -13,7 +13,18 @@ import Control.Applicative
 import HaXmlHelper
 import DdexParsing
 
-data Product = Product {sender::String, title::String} deriving (Show)
+data Track = Track
+	{ disc :: Int
+	, track :: Int
+	, track_title :: String
+	, territories :: [String]
+	} deriving (Show)
+
+data Product = Product 
+	{ sender::String
+	, product_title::String
+	, tracks::[Track]
+	} deriving (Show)
 
 -- give a file name and a filter, will print resulting structure
 checkPath :: String -> (Node -> Nodes) -> IO ()
@@ -26,7 +37,24 @@ main = readFile exampleFile >>= putStrLn . show . readProduct . parseXml
 
 -- Populate a product record from a ddex NewReleaseMessage
 readProduct :: Nodes -> Product
-readProduct n = Product {sender=senderString n, title=productTitle n}
+readProduct n = Product 
+	{sender = senderString n
+	, product_title = productTitle n
+	, tracks = map (readTrack) (trackCodes n)
+	}
+
+-- return the Resource code and Release code for all track-level releases
+trackCodes :: Nodes -> [(String, String)]
+trackCodes n = map (\r -> (r, "")) (map (releaseReferences) (unroll (trackReleases) n))
+
+-- given the release and resource codes of a track, populate a track record
+readTrack :: (String, String) -> Track
+readTrack rsrc =  Track
+	{ disc = 1
+	, track = 1
+	, track_title = (fst rsrc)
+	, territories = []
+	}
 
 -- find first preference sender id
 senderString :: Nodes -> String
