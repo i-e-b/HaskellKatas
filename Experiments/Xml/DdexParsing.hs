@@ -36,7 +36,3 @@ productRelease = (allTags "ReleaseList" /> tag "Release") `with` (allTags "Relea
 -- Return all releases with track-level release types ("TrackRelease", "VideoTrackRelease")
 trackReleases :: Node -> Nodes
 trackReleases = (allTags "ReleaseList" /> tag "Release") `with` (allTags "ReleaseType" /> matchingAnyText ["TrackRelease", "VideoTrackRelease"])
-
-matchingAnyText :: [String] -> Node -> Nodes
-matchingAnyText [] = none
-matchingAnyText (t:ts) = (matchingText t) |>| (matchingAnyText ts)

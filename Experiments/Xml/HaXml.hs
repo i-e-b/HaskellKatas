@@ -8,8 +8,6 @@ import Text.XML.HaXml.Parse
 import Text.XML.HaXml.Posn (Posn, noPos)
 import Text.XML.HaXml.Combinators
 
-import Control.Applicative
-
 import HaXmlHelper
 import DdexParsing
 
@@ -26,22 +24,17 @@ data Product = Product
 	, tracks::[Track]
 	} deriving (Show)
 
--- give a file name and a filter, will print resulting structure
-checkPath :: String -> (Node -> Nodes) -> IO ()
-checkPath file filter = do
+-- give a file name and a filter, will print resulting structure	
+showFilter :: (Show a) => String -> (Node -> a) -> IO ()
+showFilter file filter = do
 	doc <- readFile file 
-	putStrLn . show $ (structure . filter <$> (parseXml doc))
-	
-dig :: (Show a) => String -> (Node -> a) -> IO ()
-dig file filter = do
-	doc <- readFile file 
-	putStrLn . show $ (filter <$> (parseXml doc))
+	putStrLn . show $ (fmap (filter) (parseXml doc))
 
 exampleFile = "example.xml"
-main = readFile exampleFile >>= putStrLn . show . readProduct . parseXml
+main = showFilter exampleFile readProduct
 
 -- Populate a product record from a ddex NewReleaseMessage
-readProduct :: Nodes -> Product
+readProduct :: Node -> Product
 readProduct n = Product
 	{ sender = senderString n
 	, product_title = productTitle n
@@ -49,11 +42,10 @@ readProduct n = Product
 	}
 
 -- return the Resource code and Release code for all track-level releases
-trackCodes :: Nodes -> [(String, String)]
+trackCodes :: Node -> [(String, String)]
 trackCodes n =
-	let eachTrackRef node = map (releaseReference) (trackReleases node)
-	    allReleaseRefs nodes = concat (unroll (eachTrackRef) nodes)
-	in  map (\releaseCode -> (releaseCode, "")) (allReleaseRefs n)
+	let refs = map (releaseReference) (trackReleases n)
+	in  map (\releaseCode -> (releaseCode, "")) (refs)
 
 -- given the release and resource codes of a track, populate a track record
 readTrack :: (String, String) -> Track
@@ -65,12 +57,12 @@ readTrack rsrc =  Track
 	}
 
 -- find first preference sender id
-senderString :: Nodes -> String
-senderString = allText senderId
+senderString :: Node -> String
+senderString = innerText . senderId
 
 -- product type release title: ReleaseList/Release(/ReleaseType = Album|Bundle)/ReferenceTitle/TitleText -> inner text
-productTitle :: Nodes -> String
-productTitle = allText (releaseTitle . productRelease)
+productTitle :: Node -> String
+productTitle = innerText . releaseTitle . productRelease
 
 
 

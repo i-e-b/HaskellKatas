@@ -1,24 +1,28 @@
 
 -- Some helper functions to make working with HaXml more fluent
 module HaXmlHelper
-	( Node
-	, Nodes
+	( Node, Nodes
 	, parseXml
 	, structure, unroll
 	, allTags, allText, innerText, texts
 	, rootElementName
-	, matchingText) where
+	, matchingText, matchingAnyText) where
 
 import Text.XML.HaXml
 import Text.XML.HaXml.Types
 import Text.XML.HaXml.Parse
 import Text.XML.HaXml.Posn (Posn, noPos)
 import Text.XML.HaXml.Combinators
-import Control.Applicative
+import Control.Applicative ( (<$>) )
 
 -- (Node -> Nodes) == (CFilter Posn)
 type Node = Content Posn
 type Nodes = [Content Posn]
+
+-- Given a list of strings, keep nodes that exactly match any in the list
+matchingAnyText :: [String] -> Node -> Nodes
+matchingAnyText [] = none
+matchingAnyText (t:ts) = (matchingText t) |>| (matchingAnyText ts)
 
 -- Given a filter and a source document, concat all matching inner-texts into one string
 allText :: (Node -> Nodes) -> Nodes -> String
