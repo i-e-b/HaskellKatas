@@ -31,21 +31,29 @@ checkPath :: String -> (Node -> Nodes) -> IO ()
 checkPath file filter = do
 	doc <- readFile file 
 	putStrLn . show $ (structure . filter <$> (parseXml doc))
+	
+dig :: (Show a) => String -> (Node -> a) -> IO ()
+dig file filter = do
+	doc <- readFile file 
+	putStrLn . show $ (filter <$> (parseXml doc))
 
 exampleFile = "example.xml"
 main = readFile exampleFile >>= putStrLn . show . readProduct . parseXml
 
 -- Populate a product record from a ddex NewReleaseMessage
 readProduct :: Nodes -> Product
-readProduct n = Product 
-	{sender = senderString n
+readProduct n = Product
+	{ sender = senderString n
 	, product_title = productTitle n
 	, tracks = map (readTrack) (trackCodes n)
 	}
 
 -- return the Resource code and Release code for all track-level releases
 trackCodes :: Nodes -> [(String, String)]
-trackCodes n = map (\r -> (r, "")) (map (releaseReferences) (unroll (trackReleases) n))
+trackCodes n =
+	let eachTrackRef node = map (releaseReference) (trackReleases node)
+	    allReleaseRefs nodes = concat (unroll (eachTrackRef) nodes)
+	in  map (\releaseCode -> (releaseCode, "")) (allReleaseRefs n)
 
 -- given the release and resource codes of a track, populate a track record
 readTrack :: (String, String) -> Track

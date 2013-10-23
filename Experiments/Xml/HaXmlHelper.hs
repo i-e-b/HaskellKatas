@@ -29,8 +29,8 @@ texts :: (Node -> Nodes) -> Nodes -> [String]
 texts filter doc = innerText . filter <$> doc
 
 -- Given a filter and a set of nodes, return all sets of filter results
-unroll :: (Node -> Nodes) -> Nodes -> [Nodes]
-unroll filter nodes = map (filter) nodes
+unroll :: (Node -> a) -> Nodes -> [a]
+unroll filter nodes = filter <$> nodes
 
 -- Take a set of nodes and return an XML string of their contents
 structure :: Verbatim a => [a] -> [Char] -- Nodes -> String
@@ -45,7 +45,7 @@ parseXml :: String -> Nodes
 parseXml fileName = docContent $ xmlParse ("error in " ++ fileName) fileName
 
 -- All matching tags in the document
-allTags :: String -> CFilter i
+allTags :: String -> Node -> Nodes
 allTags = deep . tag
 
 -- Concatenate all text (without elements) from the given nodes

@@ -2,7 +2,7 @@
 -- DDEX specific parsing functions.
 -- Use this to decompose an XML message into a working record set.
 module DdexParsing
-	( allDeals, senderId, releaseTitle, productRelease, releaseReferences, trackReleases) where
+	( allDeals, senderId, releaseTitle, productRelease, releaseReference, trackReleases) where
 
 import Text.XML.HaXml
 import Text.XML.HaXml.Types
@@ -25,9 +25,9 @@ senderId = (allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
 releaseTitle :: Nodes -> Nodes
 releaseTitle = concatMap (allTags "ReferenceTitle" /> tag "TitleText")
 
--- Reference codes of a set of releases
-releaseReferences :: Nodes -> String
-releaseReferences = allText (allTags "ReleaseReference")
+-- Reference codes for a release
+releaseReference :: Node -> String
+releaseReference n = innerText (allTags "ReleaseReference" n)
 
 -- Return all releases with Product-level release types ("Bundle", "Single", "Album", "VideoAlbum", "VideoSingle")
 productRelease :: Node -> Nodes
