@@ -2,7 +2,7 @@
 -- DDEX specific parsing functions.
 -- Use this to decompose an XML message into a working record set.
 module DdexParsing
-	( allDeals, senderId, releaseTitle, productRelease, releaseReference, trackReleases, releasePrimaryResources) where
+	( allDeals, senderId, releaseTitle, productRelease, releaseReference, trackReleases, releasePrimaryResources, resourceById) where
 
 import Text.XML.HaXml.Combinators
 import HaXmlHelper
@@ -16,11 +16,9 @@ senderId :: Filter
 senderId = (allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
 	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId") -- `|>|` means output right only if no left.
 
-
 -- Title of a release
 releaseTitle :: Filter
 releaseTitle = allTags "ReferenceTitle" /> tag "TitleText"
-
 
 -- Reference codes for a release
 releaseReference :: Node -> String
@@ -31,6 +29,11 @@ releasePrimaryResources :: Node -> [String]
 releasePrimaryResources n = 
 	let filter = (allTags "ReleaseResourceReferenceList" /> tag "ReleaseResourceReference") `with` (exactAttribute "ReleaseResourceType" "PrimaryResource")
 	in  innerTexts (filter n)
+
+-- pick a sound recording by resource ID.
+-- this should try to generalise by returning any kind of resource.
+resourceById :: String -> Filter
+resourceById id = (allTags "ResourceList" /> tag "SoundRecording") `with` (allTags "ResourceReference" /> matchingText id)
 
 -- Return all releases with Product-level release types ("Bundle", "Single", "Album", "VideoAlbum", "VideoSingle")
 productRelease :: Filter
