@@ -2,14 +2,9 @@
 -- DDEX specific parsing functions.
 -- Use this to decompose an XML message into a working record set.
 module DdexParsing
-	( allDeals, senderId, releaseTitle, productRelease, releaseReference, trackReleases) where
+	( allDeals, senderId, releaseTitle, productRelease, releaseReference, trackReleases, releasePrimaryResources) where
 
-import Text.XML.HaXml
-import Text.XML.HaXml.Types
-import Text.XML.HaXml.Parse
-import Text.XML.HaXml.Posn (Posn, noPos)
 import Text.XML.HaXml.Combinators
-
 import HaXmlHelper
 
 -- All deals for all releases
@@ -28,6 +23,12 @@ releaseTitle = concatMap (allTags "ReferenceTitle" /> tag "TitleText")
 -- Reference codes for a release
 releaseReference :: Node -> String
 releaseReference n = innerText (allTags "ReleaseReference" n)
+
+-- All primary resources for a release
+releasePrimaryResources :: Node -> [String]
+releasePrimaryResources n = 
+	let filter = (allTags "ReleaseResourceReferenceList" /> tag "ReleaseResourceReference") `with` (exactAttribute "ReleaseResourceType" "PrimaryResource")
+	in  innerTexts (filter n)
 
 -- Return all releases with Product-level release types ("Bundle", "Single", "Album", "VideoAlbum", "VideoSingle")
 productRelease :: Node -> Nodes
