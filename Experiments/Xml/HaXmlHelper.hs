@@ -1,7 +1,7 @@
 -- Some helper functions to make working with HaXml more fluent
 
 module HaXmlHelper
-	( Node, Nodes
+	( Node, Nodes, Filter
 	, parseXml
 	, structure, unroll
 	, allTags, allText, innerText, innerTexts, texts
@@ -28,8 +28,8 @@ exactAttribute :: String -> String -> Filter
 exactAttribute name value = attrval (N name, AttValue [Left value])
 
 -- Given a filter and a source document, concat all matching inner-texts into one string
-allText :: Filter -> Nodes -> String
-allText filter doc = concatMap (innerText . filter) (doc)
+allText :: Filter -> Node -> String
+allText filter doc = innerText (filter doc)
 
 -- Given a filter and a source document, return a list of all matching inner-texts.
 texts :: Filter -> Nodes -> [String]

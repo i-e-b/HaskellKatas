@@ -2,6 +2,7 @@
 -- Parsing DDEX documents in Haskell
 
 import HaXmlHelper
+import Text.XML.HaXml.Combinators
 import DdexParsing
 
 data Track = Track
@@ -55,7 +56,7 @@ senderString = innerText . senderId
 
 -- product type release title: ReleaseList/Release(/ReleaseType = Album|Bundle)/ReferenceTitle/TitleText -> inner text
 productTitle :: Node -> String
-productTitle = innerText . releaseTitle . productRelease
+productTitle = allText (productRelease /> releaseTitle)
 
 
 

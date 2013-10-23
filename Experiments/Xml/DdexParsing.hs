@@ -8,17 +8,19 @@ import Text.XML.HaXml.Combinators
 import HaXmlHelper
 
 -- All deals for all releases
-allDeals :: Node -> Nodes
+allDeals :: Filter
 allDeals = allTags "Deal"
 
 -- Sender ID, preferring "SentOnBehalfOf", returning "MessageSender" otherwise
-senderId :: Node -> Nodes
+senderId :: Filter
 senderId = (allTags "MessageHeader" /> tag "SentOnBehalfOf" /> tag "PartyId")
 	|>| (allTags "MessageHeader" /> tag "MessageSender" /> tag "PartyId") -- `|>|` means output right only if no left.
 
+
 -- Title of a release
-releaseTitle :: Nodes -> Nodes
-releaseTitle = concatMap (allTags "ReferenceTitle" /> tag "TitleText")
+releaseTitle :: Filter
+releaseTitle = allTags "ReferenceTitle" /> tag "TitleText"
+
 
 -- Reference codes for a release
 releaseReference :: Node -> String
@@ -31,9 +33,9 @@ releasePrimaryResources n =
 	in  innerTexts (filter n)
 
 -- Return all releases with Product-level release types ("Bundle", "Single", "Album", "VideoAlbum", "VideoSingle")
-productRelease :: Node -> Nodes
+productRelease :: Filter
 productRelease = (allTags "ReleaseList" /> tag "Release") `with` (allTags "ReleaseType" /> matchingAnyText ["Bundle", "Single", "Album", "VideoAlbum", "VideoSingle"])
 
 -- Return all releases with track-level release types ("TrackRelease", "VideoTrackRelease")
-trackReleases :: Node -> Nodes
+trackReleases :: Filter
 trackReleases = (allTags "ReleaseList" /> tag "Release") `with` (allTags "ReleaseType" /> matchingAnyText ["TrackRelease", "VideoTrackRelease"])
