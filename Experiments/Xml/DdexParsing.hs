@@ -3,7 +3,7 @@
 -- Use this to decompose an XML message into a working record set.
 module DdexParsing
 	( allDeals, senderId, releaseTitle, productRelease, releaseReference, trackReleases, releasePrimaryResources, resourceById
-	, trackISRC) where
+	, trackISRC, dealsForRelease, downloadTerritories) where
 
 import Text.XML.HaXml.Combinators
 import HaXmlHelper
@@ -11,6 +11,18 @@ import HaXmlHelper
 -- All deals for all releases
 allDeals :: Filter
 allDeals = allTags "Deal"
+
+-- Deal groups for a given release ID
+dealsForRelease :: String -> Filter
+dealsForRelease releaseId = ((allTags "ReleaseDeal") `with` (allTags "DealReleaseReference" /> matchingText releaseId)) /> tag "Deal"
+
+-- PAYG/Permanent download territories expressed in a deal node
+downloadTerritories :: Nodes -> [String]
+downloadTerritories dealNode = 
+	let payg = (allTags "CommercialModelType" /> matchingText "PayAsYouGoModel")
+	    permDown = (allTags "Usage" /> tag "UseType" /> matchingText "PermanentDownload")
+	    territories = (allTags "DealTerms" `with` payg `with` permDown) /> tag "TerritoryCode"
+	in  texts (territories) dealNode
 
 -- Sender ID, preferring "SentOnBehalfOf", returning "MessageSender" otherwise
 senderId :: Filter

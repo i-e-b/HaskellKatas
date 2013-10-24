@@ -33,14 +33,14 @@ allText filter doc = innerText (filter doc)
 
 -- Given a filter and a source document, return a list of all matching inner-texts.
 texts :: Filter -> Nodes -> [String]
-texts filter doc = fmap (innerText . filter) doc
+texts filter doc = concat (fmap (innerTexts . filter) doc)
 
 -- Given a filter and a set of nodes, return all sets of filter results
 unroll :: (Node -> a) -> Nodes -> [a]
 unroll filter nodes = fmap (filter) nodes
 
 -- Take a set of nodes and return an XML string of their contents
-structure :: Verbatim a => [a] -> [Char] -- Nodes -> String
+structure :: Verbatim a => [a] -> String
 structure nodes = concatMap (verbatim) nodes
 
 -- Filter nodes based on exact text content

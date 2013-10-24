@@ -8,7 +8,7 @@ For DDEX spec see http://ddex.net/dd/DDEX-ERN-341-DD/
 Todo
 -----
 
+ * Release territories for track and product
  * Track grouping (disc/track#)
  * Track titles (including release & resource level, default language)
- * Release territories for track and product
  * Validation & output (MaybeT State ?)

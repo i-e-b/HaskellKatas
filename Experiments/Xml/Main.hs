@@ -44,14 +44,14 @@ single = (!! 0)
 
 -- given the release and resource codes of a track, populate a track record
 readTrack :: Node -> (String, String) -> Track
-readTrack doc ids = 
-	let resource = (resourceById (snd ids) doc) !! 0
+readTrack doc (releaseId, rsrcId) = 
+	let resource = (resourceById (rsrcId) doc) !! 0
 	in  Track
 		{ disc = 1
 		, track = 1
 		, isrc = trackISRC resource
-		, track_title = (fst ids) ++ "/" ++ (snd ids)
-		, territories = []
+		, track_title = releaseId ++ "/" ++ rsrcId
+		, territories = downloadTerritories . (dealsForRelease releaseId) $ doc
 		}
 
 -- find first preference sender id
