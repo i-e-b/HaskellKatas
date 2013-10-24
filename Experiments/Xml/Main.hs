@@ -8,6 +8,7 @@ import DdexParsing
 data Track = Track
 	{ disc :: Int
 	, track :: Int
+	, isrc :: String
 	, track_title :: String
 	, territories :: [String]
 	} deriving (Show)
@@ -32,7 +33,7 @@ readProduct :: Node -> Product
 readProduct n = Product
 	{ sender = senderString n
 	, product_title = productTitle n
-	, tracks = map (readTrack) (trackCodes n)
+	, tracks = map (readTrack n) (trackCodes n)
 	}
 
 -- return the Resource code and Release code for all track-level releases
@@ -42,13 +43,16 @@ trackCodes n = map (\release -> (releaseReference release, single $ releasePrima
 single = (!! 0)
 
 -- given the release and resource codes of a track, populate a track record
-readTrack :: (String, String) -> Track
-readTrack rsrc =  Track
-	{ disc = 1
-	, track = 1
-	, track_title = (fst rsrc) ++ "/" ++ (snd rsrc)
-	, territories = []
-	}
+readTrack :: Node -> (String, String) -> Track
+readTrack doc ids = 
+	let resource = (resourceById (snd ids) doc) !! 0
+	in  Track
+		{ disc = 1
+		, track = 1
+		, isrc = trackISRC resource
+		, track_title = (fst ids) ++ "/" ++ (snd ids)
+		, territories = []
+		}
 
 -- find first preference sender id
 senderString :: Node -> String

@@ -2,7 +2,8 @@
 -- DDEX specific parsing functions.
 -- Use this to decompose an XML message into a working record set.
 module DdexParsing
-	( allDeals, senderId, releaseTitle, productRelease, releaseReference, trackReleases, releasePrimaryResources, resourceById) where
+	( allDeals, senderId, releaseTitle, productRelease, releaseReference, trackReleases, releasePrimaryResources, resourceById
+	, trackISRC) where
 
 import Text.XML.HaXml.Combinators
 import HaXmlHelper
@@ -29,6 +30,10 @@ releasePrimaryResources :: Node -> [String]
 releasePrimaryResources n = 
 	let filter = (allTags "ReleaseResourceReferenceList" /> tag "ReleaseResourceReference") `with` (exactAttribute "ReleaseResourceType" "PrimaryResource")
 	in  innerTexts (filter n)
+
+-- get the isrc tag for a sound recording
+trackISRC :: Node -> String
+trackISRC n = innerText (allTags "SoundRecording" /> tag "SoundRecordingId" /> tag "ISRC" $ n)
 
 -- pick a sound recording by resource ID.
 -- this should try to generalise by returning any kind of resource.
