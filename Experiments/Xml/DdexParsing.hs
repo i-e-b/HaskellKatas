@@ -8,10 +8,6 @@ module DdexParsing
 import Text.XML.HaXml.Combinators
 import HaXmlHelper
 
--- All deals for all releases
-allDeals :: Filter
-allDeals = allTags "Deal"
-
 -- Deal groups for a given release ID
 dealsForRelease :: String -> Filter
 dealsForRelease releaseId = ((allTags "ReleaseDeal") `with` (allTags "DealReleaseReference" /> matchingText releaseId)) /> tag "Deal"
@@ -46,6 +42,17 @@ releasePrimaryResources n =
 -- get the isrc tag for a sound recording
 trackISRC :: Node -> String
 trackISRC n = innerText (allTags "SoundRecording" /> tag "SoundRecordingId" /> tag "ISRC" $ n)
+
+-- given a resource id and release id, choose the best available display title.
+-- Resource
+--      <Title TitleType="DisplayTitle">
+-- Release, details by territory:
+--      <Title TitleType="DisplayTitle">
+--          <TitleText>Take the 'A' Train</TitleText>
+-- Release:
+--      <ReferenceTitle>
+--          <TitleText>Take the 'A' Train</TitleText>
+--
 
 -- pick a sound recording by resource ID.
 -- this should try to generalise by returning any kind of resource.
