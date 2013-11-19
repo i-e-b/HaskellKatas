@@ -2,7 +2,7 @@
 -- DDEX specific parsing functions.
 -- Use this to decompose an XML message into a working record set.
 module DdexParsing
-	( allDeals, senderId, releaseTitle, productRelease, releaseReference, trackReleases, releasePrimaryResources, resourceById
+	( senderId, releaseTitle, productRelease, releaseReference, trackReleases, releasePrimaryResources, resourceById
 	, trackISRC, dealsForRelease, downloadTerritories) where
 
 import Text.XML.HaXml.Combinators
